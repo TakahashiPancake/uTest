@@ -1,0 +1,6 @@
+{
+  "requirements":[
+    "pyyaml"
+  ],
+  "pip_index_url": "https://mirrors.aliyun.com/pypi/simple/"
+}
