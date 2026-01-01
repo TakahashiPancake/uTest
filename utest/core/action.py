@@ -53,8 +53,8 @@ class Action(object):
       caller_instance = prev_frame.f_locals.get('self')
 
       # 截止条件：
-      # - 调用者实例是一个测试用例（框架定义的测试用例有get_logger方法）
-      if hasattr(caller_instance, 'get_logger'):
+      # - 调用者实例是一个测试用例（框架定义的测试用例有_get_logger方法）
+      if hasattr(caller_instance, '_get_logger'):
         case_instance = caller_instance
         break
 
