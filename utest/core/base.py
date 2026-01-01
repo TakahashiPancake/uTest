@@ -22,12 +22,11 @@ class Base(unittest.TestCase):
     super().__init__(methodName=methodName)
 
     # 创建日志器
-    self.get_logger()
+    self._get_logger()
 
 
-  @classmethod
-  def get_logger(
-    cls,
+  def _get_logger(
+    self,
     logger_name          = 'uLogger',              # uLogger是uTest框架下的日志器
     logging_config_path  = 'config/logging.yaml',   # 配置文件路径
     config_file_encoding = 'utf-8'                  # 配置文件默认用UTF-8编码
@@ -76,7 +75,7 @@ class Base(unittest.TestCase):
     patcher.patch_logging(logging_config_path)
 
     # 创建日志器并绑定到类
-    setattr(cls, logger_name, logging.getLogger(logger_name))
+    setattr(self, logger_name, logging.getLogger(logger_name))
 
     # 读取配置文件
     config = util.read_yaml_config(
@@ -87,7 +86,7 @@ class Base(unittest.TestCase):
     # 导入更多日志级别
     if more_levels in config:
       for fn in config[more_levels].keys():
-        add_func_2_obj(cls, logger_name, fn)
+        add_func_2_obj(self, logger_name, fn)
 
     # 导入logging内置日志级别
     for fn in [
@@ -95,7 +94,7 @@ class Base(unittest.TestCase):
       'warning',
       'error'
     ]:
-      add_func_2_obj(cls, logger_name, fn)
+      add_func_2_obj(self, logger_name, fn)
 
 
   def trace(self, msg, *args, **kwargs):
