@@ -1,5 +1,6 @@
 from .patch import patcher
 from .util import util
+from .meta import Meta
 import logging
 import unittest
 
@@ -16,8 +17,16 @@ class Base(unittest.TestCase):
 
   """
   def __init__(self, methodName='runTest') -> None:
-    """构造函数"""
+    """
+    构造函数
 
+    Args:
+      methodName: 默认测试方法
+
+    Returns:
+      return:     无
+
+    """
     super().__init__(methodName=methodName)
 
     # 创建日志器
@@ -26,9 +35,11 @@ class Base(unittest.TestCase):
 
   def _get_logger(
     self,
-    logger_name          = 'uLogger',              # uLogger是uTest框架下的日志器
-    logging_config_path  = 'config/logging.yaml',   # 配置文件路径
-    config_file_encoding = 'utf-8'                  # 配置文件默认用UTF-8编码
+    logger_name          = 'uLogger',       # uLogger是uTest框架下的日志器
+    logging_config_path  = util.path.join(
+      Meta.CONFIG_DIR, Meta.CONFIGs.LOGGING
+    ),                                      # 配置文件路径
+    config_file_encoding = 'utf-8'          # 配置文件默认用UTF-8编码
   ) -> None:
     """
     创建日志器

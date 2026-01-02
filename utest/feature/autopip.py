@@ -1,22 +1,16 @@
-from traceback import print_last, print_list
-
 from .util import util
+from .meta import Meta
 from datetime import datetime
 from contextlib import redirect_stdout
 from contextlib import redirect_stderr
 import io
-import os
 import sys
-
-# 定义日志文件
-log_name = 'autopip.log'
-log_dir  = 'log/'
 
 
 class AutoPIP(object):
   """自动调用pip安装依赖包"""
 
-  _log_path = os.path.join(log_dir, log_name)
+  _log_path = util.path.join(Meta.LOG_DIR, Meta.LOGs.AUTOPIP)
 
   _packages_installed = False
 
@@ -28,7 +22,11 @@ class AutoPIP(object):
     upgrade  = False
   ):
     """
-    主方法 - 自动调用pip安装依赖包
+    主方法
+
+    - 面向过程
+
+    - 自动调用pip安装依赖包
 
     Args:
       config_path: 配置文件路径；

@@ -78,6 +78,7 @@ class Patcher:
 
       # 设置logging配置文件目录
       setattr(logging, '_config_path', config_path)
+      print(config_path)
 
     elif getattr(logging, '_config_path') != config_path:
       raise ValueError(
