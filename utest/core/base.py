@@ -15,7 +15,6 @@ class Base(unittest.TestCase):
   3. 声明日志方法
 
   """
-  # method_name命名可能在后续调用中有问题，若出现此问题，请将method_name更改为methodName
   def __init__(self, methodName='runTest') -> None:
     """构造函数"""
 
