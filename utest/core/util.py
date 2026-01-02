@@ -1,4 +1,4 @@
-from utest.util import framework_util
+from utest.util import root_util
 
-util = framework_util
+util = root_util
 

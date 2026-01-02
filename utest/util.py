@@ -5,7 +5,7 @@ Utility
 
 """
 import functools
-from typing import Literal
+from typing import Literal, LiteralString
 from contextlib import redirect_stdout
 from contextlib import redirect_stderr
 import inspect
@@ -14,26 +14,8 @@ import sys
 import os
 
 
-class FrameworkUtil(object):
+class RootUtil(object):
   """复用功能"""
-
-  # 文件写模式
-  write_modes = Literal[
-    "w", "wt", "tw",
-    "a", "at", "ta",
-    "x", "xt", "tx",
-    "w+", "+w", "wt+", "w+t", "+wt", "tw+", "t+w", "+tw",
-    "a+", "+a", "at+", "a+t", "+at", "ta+", "t+a", "+ta",
-    "x+", "+x", "xt+", "x+t", "+xt", "tx+", "t+x", "+tx"
-  ]
-
-  # 文件读模式
-  read_modes = Literal[
-    "r", "rt", "tr",
-    "r+", "+r", "rt+", "r+t", "+rt", "tr+", "t+r", "+tr",
-    "U", "rU", "Ur", "rtU", "rUt", "Urt", "trU", "tUr", "Utr"
-  ]
-
 
   class RedirectLogging(object):
     """
@@ -62,12 +44,12 @@ class FrameworkUtil(object):
 
       """
       # 获取外部类
-      self.Outer = FrameworkUtil
+      self.Outer = RootUtil
 
       # 导入外部类方法
-      self._abs_path_in_framework  = self.Outer.abs_path_in_framework
-      self._get_dir_path_from_path = self.Outer.get_dir_path_from_path
-      self._create_directories     = self.Outer.create_directories
+      self._abs_path_in_framework  = self.Outer.path.abs_path_in_framework
+      self._get_dir_path_from_path = self.Outer.path.get_dir_path_from_path
+      self._create_dirs            = self.Outer.path.create_dirs
       self._write_string_to_file   = self.Outer.write_string_to_file
       self._get_var_name           = self.Outer.get_var_name
 
@@ -117,7 +99,7 @@ class FrameworkUtil(object):
         str_: str = io_stream.getvalue()
 
         # 创建文件夹
-        self._create_directories(self._dir_path)
+        self._create_dirs(self._dir_path)
 
         # 写入日志
         self._write_string_to_file(str_, self._abs_path)
@@ -125,6 +107,92 @@ class FrameworkUtil(object):
         return result
 
       return wrapper
+
+
+  class Path(object):
+    """目录操作"""
+
+    @staticmethod
+    def abs_path_in_framework(path: str) -> str:
+      """
+      获取包内绝对路径
+
+      Args:
+        path:   路径
+
+      Returns:
+        return: 绝对路径
+
+      """
+      if os.path.isabs(path):
+        return path
+
+      else:
+        # 获取包的根目录
+        pkg_root_path = os.path.dirname(os.path.abspath(__file__))
+
+        # 返回绝对路径
+        return str(os.path.join(pkg_root_path, path))
+
+
+    @staticmethod
+    def get_dir_path_from_path(file_path: str) -> str:
+      """
+      通过文件路径获取所在文件夹路径
+
+      Args:
+        file_path: 文件路径
+
+      Returns:
+        return:    文件所在文件夹路径
+
+      """
+      dir_path = os.path.dirname(file_path)
+
+      return dir_path
+
+
+    @staticmethod
+    def create_dirs(path: str) -> None:
+      """
+      递归创建目录
+
+      Args:
+        path:   路径
+
+      Returns:
+        return: 无
+
+      """
+      if not os.path.exists(path):
+        os.makedirs(path)
+
+
+    @staticmethod
+    def join(a: LiteralString, /, *paths: LiteralString) -> LiteralString | str | bytes:
+
+      return os.path.join(a, *paths)
+
+
+  # 文件写模式
+  write_modes = Literal[
+    "w", "wt", "tw",
+    "a", "at", "ta",
+    "x", "xt", "tx",
+    "w+", "+w", "wt+", "w+t", "+wt", "tw+", "t+w", "+tw",
+    "a+", "+a", "at+", "a+t", "+at", "ta+", "t+a", "+ta",
+    "x+", "+x", "xt+", "x+t", "+xt", "tx+", "t+x", "+tx"
+  ]
+
+  # 文件读模式
+  read_modes = Literal[
+    "r", "rt", "tr",
+    "r+", "+r", "rt+", "r+t", "+rt", "tr+", "t+r", "+tr",
+    "U", "rU", "Ur", "rtU", "rUt", "Urt", "trU", "tUr", "Utr"
+  ]
+
+
+  path = Path
 
 
   def read_json_config(self,
@@ -146,7 +214,7 @@ class FrameworkUtil(object):
 
     # 读取配置文件
     with open(
-      self.abs_path_in_framework(config_path),
+      self.path.abs_path_in_framework(config_path),
       'r',
       encoding=encoding
     ) as config_file:
@@ -175,69 +243,13 @@ class FrameworkUtil(object):
 
     # 读取配置文件
     with open(
-      self.abs_path_in_framework(config_path),
+      self.path.abs_path_in_framework(config_path),
       'r',
       encoding=encoding
     ) as config_file:
       config = yaml.safe_load(config_file)
 
     return config
-
-
-  @staticmethod
-  def abs_path_in_framework(path: str) -> str:
-    """
-    获取包内绝对路径
-
-    Args:
-      path:   路径
-
-    Returns:
-      return: 绝对路径
-
-    """
-    if os.path.isabs(path):
-      return path
-
-    else:
-      # 获取包的根目录
-      pkg_root_path = os.path.dirname(os.path.abspath(__file__))
-
-      # 返回绝对路径
-      return str(os.path.join(pkg_root_path, path))
-
-
-  @staticmethod
-  def get_dir_path_from_path(file_path: str) -> str:
-    """
-    通过文件路径获取所在文件夹路径
-
-    Args:
-      file_path: 文件路径
-
-    Returns:
-      return:    文件所在文件夹路径
-
-    """
-    dir_path = os.path.dirname(file_path)
-
-    return dir_path
-
-
-  @staticmethod
-  def create_directories(path: str) -> None:
-    """
-    递归创建目录
-
-    Args:
-      path:   路径
-
-    Returns:
-      return: 无
-
-    """
-    if not os.path.exists(path):
-      os.makedirs(path)
 
 
   @staticmethod
@@ -286,5 +298,6 @@ class FrameworkUtil(object):
     return None
 
 
-framework_util = FrameworkUtil()
+
+root_util = RootUtil()
 

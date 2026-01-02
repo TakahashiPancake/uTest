@@ -1,18 +1,28 @@
 __all__ = ['TestCase', 'Action']
 
+from .meta import RootMeta as Meta
+from .util import root_util as util
+
+
 # 安装模块
 from .feature.autopip import autopip
 autopip.main(
-  config_path = 'config/autopip.json'
+  config_path = util.path.join(
+    Meta.CONFIG_DIR, Meta.CONFIGs.AUTOPIP
+  )
 )
 
 # 修补模块
 from .core.patch import patcher
 patcher.patch_logging(
-  config_path = 'config/logging.yaml'
+  config_path = util.path.join(
+    Meta.CONFIG_DIR, Meta.CONFIGs.LOGGING
+  )
 )
 patcher.patch_unittest(
-  config_path = 'config/unittest.yaml'
+  config_path = util.path.join(
+    Meta.CONFIG_DIR, Meta.CONFIGs.UNITTEST
+  )
 )
 
 # 导入模块
