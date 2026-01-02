@@ -1,11 +1,22 @@
+from traceback import print_last, print_list
+
 from .util import util
+from datetime import datetime
 from contextlib import redirect_stdout
+from contextlib import redirect_stderr
 import io
+import os
+import sys
+
+# 定义日志文件
+log_name = 'autopip.log'
+log_dir  = 'log/'
+
 
 class AutoPIP(object):
   """自动调用pip安装依赖包"""
 
-  _log_path = 'log/autopip.log'
+  _log_path = os.path.join(log_dir, log_name)
 
   _packages_installed = False
 
@@ -31,30 +42,44 @@ class AutoPIP(object):
     """
     import pip
 
+    def printl(*args, **kwargs) -> None:
+      print(*args, **kwargs, file=sys.stderr)
+
+
+    def log_print(*args, **kwargs) -> None:
+      printl(datetime.now())
+      printl(*args, **kwargs)
+
+
     def pip_cmd(args: list) -> None:
-      print('COMMAND:', 'pip', ' '.join(args), sep=' ')
+      log_print('COMMAND:', 'pip', ' '.join(args), sep=' ')
       pip.main(args)
 
 
-    def upgrade_pip():
-      print('Upgrading pip...')
+    def upgrade_pip() -> None:
       pip_cmd(['install', '--upgrade', 'pip'])
 
 
-    def read_pip_list():
-      print('Reading pip list...')
-
-      # 定义一个输入输出流
-      io_stream = io.StringIO()
+    def read_pip_list() -> str:
+      # 定义输入输出流
+      err_stream = io.StringIO()
+      io_stream  = io.StringIO()
 
       # 执行pip命令，重定向到输入输出流
-      with redirect_stdout(io_stream):
-        pip_cmd(['list'])
+      with redirect_stderr(err_stream):
+        with redirect_stdout(io_stream):
+          pip_cmd(['list'])
 
-      # 从输入输出流中读取pip包列表
+      # 从输入输出流中读取
+
+      # 日志
+      log_info: str = err_stream.getvalue()
+
+      # Python包
       packages: str = io_stream.getvalue()
 
       # 输出pip列表
+      printl(log_info)
       print(packages)
 
       return packages
@@ -80,12 +105,9 @@ class AutoPIP(object):
         for package in config.get('requirements'):
           if package.lower() not in pip_packages.lower():
             if 'pip_index_url' in config:
-              print('Installing:', package, sep=' ')
-              pip.main(
-                ['install', '--no-input', package, '-i', config.get('pip_index_url')]
-              )
+              pip_cmd(['install', '--no-input', package, '-i', config.get('pip_index_url')])
             else:
-              pip.main(['install', '--no-input', package])
+              pip_cmd(['install', '--no-input', package])
 
       self._packages_installed = True
 

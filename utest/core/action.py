@@ -26,10 +26,10 @@ class Action(object):
     self._case_instance = self._get_case_instance()
 
     # 导入日志方法
-    self._get_logging_methods_from_a_case(self._case_instance)
+    self._get_logging_methods_from_case(self._case_instance)
 
     # 导入断言方法
-    self._get_assertion_methods_from_a_case(self._case_instance)
+    self._get_assertion_methods_from_case(self._case_instance)
 
 
   @staticmethod
@@ -67,8 +67,7 @@ class Action(object):
     return case_instance
 
 
-  def _get_logging_methods_from_a_case(
-      self,
+  def _get_logging_methods_from_case(self,
       case: TestCase
   ) -> None:
     """
@@ -89,8 +88,7 @@ class Action(object):
     self.step    = case.step
 
 
-  def _get_assertion_methods_from_a_case(
-    self,
+  def _get_assertion_methods_from_case(self,
     case: TestCase
   ) -> None:
     """

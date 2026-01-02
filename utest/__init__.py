@@ -3,8 +3,7 @@ __all__ = ['TestCase', 'Action']
 # 安装模块
 from .feature.autopip import autopip
 autopip.main(
-  config_path = 'config/autopip.json',
-  upgrade     = False
+  config_path = 'config/autopip.json'
 )
 
 # 修补模块
