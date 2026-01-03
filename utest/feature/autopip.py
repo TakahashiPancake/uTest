@@ -10,12 +10,14 @@ import sys
 class AutoPIP(object):
   """自动调用pip安装依赖包"""
 
-  _log_path = util.path.join(Meta.LOG_DIR, Meta.LOGs.AUTOPIP)
-
   _packages_installed = False
 
 
-  @util.RedirectLogging(_log_path)
+  @util.Decorator.RedirectLogging(
+    util.path.join(
+      Meta.LOG_DIR, Meta.LOGs.AUTOPIP
+    )
+  )
   def main(self,
     config_path, # 必须使用json格式配置文件
     encoding = 'utf-8',

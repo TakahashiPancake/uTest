@@ -17,96 +17,98 @@ import os
 class RootUtil(object):
   """复用功能"""
 
-  class RedirectLogging(object):
-    """
-    装饰器 - 重置logging
+  class Decorator(object):
 
-    Args:
-      path:   重定向日志路径
-
-    Returns:
-      return: 被封装的方法
-
-    """
-    # 定义模块名
-    _module_name = 'logging'
-
-
-    def __init__(self, path: str = None) -> None:
+    class RedirectLogging(object):
       """
-        初始化方法
+      装饰器 - 重置logging
 
-        Args:
-          path:   重定向日志路径
+      Args:
+        path:   重定向日志路径
 
-        Returns:
-          return: 无
+      Returns:
+        return: 被封装的方法
 
       """
-      # 获取外部类
-      self.Outer = RootUtil
-
-      # 导入外部类方法
-      self._abs_path_in_framework  = self.Outer.path.abs_path_in_framework
-      self._get_dir_path_from_path = self.Outer.path.get_dir_path_from_path
-      self._create_dirs            = self.Outer.path.create_dirs
-      self._write_string_to_file   = self.Outer.write_string_to_file
-      self._get_var_name           = self.Outer.get_var_name
-
-      if path is not None:
-        # 文件绝对路径
-        self._abs_path = self._abs_path_in_framework(path)
-
-        # 文件夹绝对路径
-        self._dir_path = self._get_dir_path_from_path(self._abs_path)
-
-      else:
-        raise ValueError(f'{self._get_var_name(path)}的值不应该为None!')
+      # 定义模块名
+      _module_name = 'logging'
 
 
-    def __call__(self, func):
-
-      @functools.wraps(func)
-      def wrapper(*args, **kwargs):
+      def __init__(self, path: str = None) -> None:
         """
-        封装器
+          初始化方法
 
-        Args:
-          args:
-          kwargs:
+          Args:
+            path:   重定向日志路径
 
-        Return:
-          return:
+          Returns:
+            return: 无
 
         """
-        io_stream = io.StringIO()
+        # 获取外部类
+        self.Outer = RootUtil
 
-        # 执行pip命令，重定向到输入输出流
-        with redirect_stdout(io_stream):
-          with redirect_stderr(io_stream):
+        # 导入外部类方法
+        self._abs_path_in_framework  = self.Outer.path.abs_path_in_framework
+        self._get_dir_path_from_path = self.Outer.path.get_dir_path_from_path
+        self._create_dirs            = self.Outer.path.create_dirs
+        self._write_string_to_file   = self.Outer.write_string_to_file
+        self._get_var_name           = self.Outer.get_var_name
 
-            # 导入模块
-            if self._module_name not in sys.modules:
-              sys.modules[self._module_name] = __import__(self._module_name)
+        if path is not None:
+          # 文件绝对路径
+          self._abs_path = self._abs_path_in_framework(path)
 
-            # 执行被封装的函数
-            result = func(*args, **kwargs)
+          # 文件夹绝对路径
+          self._dir_path = self._get_dir_path_from_path(self._abs_path)
 
-            # 移除模块
-            if self._module_name in sys.modules:
-              del sys.modules[self._module_name]
+        else:
+          raise ValueError(f'{self._get_var_name(path)}的值不应该为None!')
 
-        str_: str = io_stream.getvalue()
 
-        # 创建文件夹
-        self._create_dirs(self._dir_path)
+      def __call__(self, func):
 
-        # 写入日志
-        self._write_string_to_file(str_, self._abs_path)
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+          """
+          封装器
 
-        return result
+          Args:
+            args:
+            kwargs:
 
-      return wrapper
+          Return:
+            return:
+
+          """
+          io_stream = io.StringIO()
+
+          # 执行pip命令，重定向到输入输出流
+          with redirect_stdout(io_stream):
+            with redirect_stderr(io_stream):
+
+              # 导入模块
+              if self._module_name not in sys.modules:
+                sys.modules[self._module_name] = __import__(self._module_name)
+
+              # 执行被封装的函数
+              result = func(*args, **kwargs)
+
+              # 移除模块
+              if self._module_name in sys.modules:
+                del sys.modules[self._module_name]
+
+          str_: str = io_stream.getvalue()
+
+          # 创建文件夹
+          self._create_dirs(self._dir_path)
+
+          # 写入日志
+          self._write_string_to_file(str_, self._abs_path)
+
+          return result
+
+        return wrapper
 
 
   class Path(object):
