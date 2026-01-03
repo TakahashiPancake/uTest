@@ -82,3 +82,4 @@ class TestCase(Base):
     self._unit_passed = False
 
     return super()._formatMessage(msg, standardMsg)
+
