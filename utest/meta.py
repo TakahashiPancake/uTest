@@ -1,16 +1,18 @@
 """
-定义元数据
+元数据
 
 """
-class RootMeta:
-  CONFIG_DIR = 'config'
-  LOG_DIR    = 'log'
+from enum import StrEnum as _StrEnum
 
-  class CONFIGs:
-    AUTOPIP  = 'autopip.json'
-    LOGGING  = 'logging.yaml'
-    UNITTEST = 'unittest.yaml'
 
-  class LOGs:
-    AUTOPIP = 'autopip.log'
+CONFIG_DIR = 'config'
+LOG_DIR    = 'log'
+
+class CONFIGs(_StrEnum):
+  AUTOPIP  = 'autopip.json'
+  LOGGING  = 'logging.yaml'
+  UNITTEST = 'unittest.yaml'
+
+class LOGs(_StrEnum):
+  AUTOPIP = 'autopip.log'
 

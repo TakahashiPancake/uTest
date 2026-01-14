@@ -1,6 +1,6 @@
-from .case import TestCase
-from .base import Base
 import inspect
+from .base import Base
+from .case import TestCase
 
 
 class Action(object):

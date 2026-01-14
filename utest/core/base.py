@@ -1,8 +1,9 @@
-from .patch import patcher
-from .util import util
-from .meta import Meta
 import logging
 import unittest
+import utest.util as util
+import utest.meta as meta
+from .patch import patcher
+
 
 
 class Base(unittest.TestCase):
@@ -37,7 +38,7 @@ class Base(unittest.TestCase):
     self,
     logger_name          = 'uLogger',       # uLogger是uTest框架下的日志器
     logging_config_path  = util.path.join(
-      Meta.CONFIG_DIR, Meta.CONFIGs.LOGGING
+      meta.CONFIG_DIR, meta.CONFIGs.LOGGING
     ),                                      # 配置文件路径
     config_file_encoding = 'utf-8'          # 配置文件默认用UTF-8编码
   ) -> None:
@@ -88,7 +89,7 @@ class Base(unittest.TestCase):
     setattr(self, logger_name, logging.getLogger(logger_name))
 
     # 读取配置文件
-    config = util.read_yaml_config(
+    config = util.framework.read_yaml_config(
       config_path = logging_config_path,
       encoding    = config_file_encoding
     )

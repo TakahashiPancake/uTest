@@ -1,5 +1,5 @@
-from .util import util
 import types
+import utest.util.framework as framework_util
 
 
 class Patcher(object):
@@ -59,7 +59,7 @@ class Patcher(object):
     if not hasattr(logging, '_patched'):
 
       # 读取配置文件
-      config = util.read_yaml_config(
+      config = framework_util.read_yaml_config(
         config_path = config_path,
         encoding    = encoding
       )
@@ -106,7 +106,7 @@ class Patcher(object):
     if not hasattr(unittest, '_patched'):
 
       # 读取配置文件
-      config = util.read_yaml_config(
+      config = framework_util.read_yaml_config(
         config_path = config_path,
         encoding    = encoding
       )
