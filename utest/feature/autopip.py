@@ -1,10 +1,11 @@
-from .util import util
-from .meta import Meta
-from datetime import datetime
+import sys
+import io
 from contextlib import redirect_stdout
 from contextlib import redirect_stderr
-import io
-import sys
+from datetime import datetime
+import utest.util as util
+import utest.util.decorator as decorator
+import utest.meta as meta
 
 
 class AutoPIP(object):
@@ -13,9 +14,9 @@ class AutoPIP(object):
   _packages_installed = False
 
 
-  @util.Decorator.RedirectLogging(
+  @decorator.redirect_logging(
     util.path.join(
-      Meta.LOG_DIR, Meta.LOGs.AUTOPIP
+      meta.LOG_DIR, meta.LOGs.AUTOPIP
     )
   )
   def main(self,
@@ -95,7 +96,7 @@ class AutoPIP(object):
       pip_packages = read_pip_list()
 
       # 读取配置文件
-      config = util.read_json_config(
+      config = util.framework.read_json_config(
         config_path = config_path,
         encoding    = encoding
       )
