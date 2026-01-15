@@ -14,16 +14,17 @@ class AutoPIP(object):
   _packages_installed = False
 
 
-  @decorator.redirect_logging(
-    util.path.join(
+  @decorator.redirect_module_output(
+    module_name = 'logging',
+    output_path = util.path.framework.abs_path(util.path.join(
       meta.LOG_DIR, meta.LOGs.AUTOPIP
-    )
+    ))
   )
   def main(self,
     config_path, # 必须使用json格式配置文件
     encoding = 'utf-8',
     upgrade  = False
-  ):
+  ) -> ...:
     """
     主方法
 

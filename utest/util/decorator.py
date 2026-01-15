@@ -8,12 +8,16 @@ import utest.util.path as path_util
 import utest.util.framework as framework_util
 
 
-def redirect_logging(path: str = None) -> Callable:
+def redirect_module_output(
+  module_name: str,
+  output_path: str = None
+) -> Callable:
   """
-  封装器 - 重置logging
+  装饰器工厂 - 重定向模块输出
 
   Args:
-    path:   重定向日志路径
+    module_name: 模块名称
+    output_path:   输出日志路径
 
   Returns:
     return: 被封装的方法
@@ -22,25 +26,19 @@ def redirect_logging(path: str = None) -> Callable:
   def decorator(func):
     """装饰器"""
 
-    # 模块名
-    module_name = 'logging'
-
     # 导入外部方法
-    abs_path_in_framework  = path_util.abs_path_in_framework
-    get_dir_path_from_path = path_util.get_dir_path_from_path
-    create_dirs            = path_util.create_dirs
-    write_string_to_file   = framework_util.write_string_to_file
-    get_var_name           = framework_util.get_var_name
+    get_dir_path         = path_util.dir_path
+    create_dirs          = path_util.create_dirs
+    write_string_to_file = framework_util.write_string_to_file
+    get_var_name         = framework_util.get_var_name
 
-    if path is not None:
-      # 文件绝对路径
-      abs_path = abs_path_in_framework(path)
+    if output_path is not None:
 
-      # 文件夹绝对路径
-      dir_path = get_dir_path_from_path(abs_path)
+      # 获取文件夹路径
+      dir_path = get_dir_path(output_path)
 
     else:
-      raise ValueError(f'{get_var_name(path)}的值不应该为None!')
+      raise ValueError(f'{get_var_name(output_path)} should not be None!')
 
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
@@ -49,7 +47,7 @@ def redirect_logging(path: str = None) -> Callable:
       # 创建输入输出流
       io_stream = io.StringIO()
 
-      # 执行pip命令，重定向到输入输出流
+      # 重定向到输入输出流
       with redirect_stdout(io_stream):
         with redirect_stderr(io_stream):
 
@@ -70,7 +68,7 @@ def redirect_logging(path: str = None) -> Callable:
       create_dirs(dir_path)
 
       # 写入日志
-      write_string_to_file(str_, abs_path)
+      write_string_to_file(str_, output_path)
 
       return result
 
