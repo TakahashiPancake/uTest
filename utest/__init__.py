@@ -6,8 +6,8 @@ import utest.util.path as _path
 
 
 # 安装模块
-from .feature.autopip import autopip
-autopip.main(
+from .feature.autopip import autopip as _autopip
+_autopip.main(
   config_path = _path.framework.abs_path(_path.join(
     _meta.CONFIG_DIR, _meta.CONFIGs.AUTOPIP
   ))
@@ -15,13 +15,13 @@ autopip.main(
 
 
 # 修补模块
-from .core.patch import patcher
-patcher.patch_logging_by_config_file(
+from .core.patch import patcher as _patcher
+_patcher.patch_logging_by_config_file(
   config_path = _path.framework.abs_path(_path.join(
     _meta.CONFIG_DIR, _meta.CONFIGs.LOGGING
   ))
 )
-patcher.patch_unittest_by_config_file(
+_patcher.patch_unittest_by_config_file(
   config_path = _path.framework.abs_path(_path.join(
     _meta.CONFIG_DIR, _meta.CONFIGs.UNITTEST
   ))
