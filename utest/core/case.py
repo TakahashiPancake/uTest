@@ -2,11 +2,8 @@ from .base import Base
 
 
 class TestCase(Base):
-  """
-  测试用例基类
-  - 定义测试用例的行为
+  """测试用例类"""
 
-  """
   @classmethod
   def setUpClass(cls) -> None:
     """
@@ -68,6 +65,7 @@ class TestCase(Base):
   ) -> str:
     """
     格式化错误信息
+
     - 将断言失败的原始消息与自定义消息合并，生成最终的错误信息
 
     Args:

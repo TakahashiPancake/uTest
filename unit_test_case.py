@@ -1,7 +1,7 @@
 from utest import TestCase
 from unit_test_action import TestAction
 
-class TC_Framework(TestCase):
+class TC_001_Framework(TestCase):
   def unit_001(self):
     self.step('1. 单元测试，导入uTest包')
     self.assertTrue(True, '123')
@@ -15,3 +15,5 @@ class TC_Framework(TestCase):
     TestAction().action()
 
 
+if __name__ == '__main__':
+  TC_001_Framework()()
