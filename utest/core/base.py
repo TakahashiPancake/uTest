@@ -37,9 +37,9 @@ class Base(unittest.TestCase):
   def _get_logger(
     self,
     logger_name          = 'uLogger',       # uLogger是uTest框架下的日志器
-    logging_config_path  = util.path.join(
+    logging_config_path  = util.path.framework.abs_path(util.path.join(
       meta.CONFIG_DIR, meta.CONFIGs.LOGGING
-    ),                                      # 配置文件路径
+    )),                                     # 配置文件路径
     config_file_encoding = 'utf-8'          # 配置文件默认用UTF-8编码
   ) -> None:
     """
@@ -57,7 +57,11 @@ class Base(unittest.TestCase):
     # 定义字段名称
     more_levels = 'more_levels'
 
-    def add_func_2_obj(obj, instance_name, func_name):
+    def add_func_2_obj(
+      obj: object,
+      instance_name: str,
+      func_name: str
+    ) -> None:
       """
       将（日志）方法绑定到类
 
@@ -83,7 +87,7 @@ class Base(unittest.TestCase):
       )
 
     # 给logging打补丁
-    patcher.patch_logging(logging_config_path)
+    patcher.patch_logging_by_config_file(logging_config_path)
 
     # 创建日志器并绑定到类
     setattr(self, logger_name, logging.getLogger(logger_name))
@@ -108,43 +112,43 @@ class Base(unittest.TestCase):
       add_func_2_obj(self, logger_name, fn)
 
 
-  def trace(self, msg, *args, **kwargs):
+  def trace(self, msg, *args, **kwargs) -> None:
     """在日志中输出详细信息"""
-    pass
+    ...
 
-  def info(self, msg, *args, **kwargs):
+  def info(self, msg, *args, **kwargs) -> None:
     """在日志中输出一般信息"""
-    pass
+    ...
 
-  def warning(self, msg, *args, **kwargs):
+  def warning(self, msg, *args, **kwargs) -> None:
     """在日志中输出警告信息"""
-    pass
+    ...
 
-  def error(self, msg, *args, **kwargs):
+  def error(self, msg, *args, **kwargs) -> None:
     """在日志中输出错误信息"""
-    pass
+    ...
 
-  def fatal(self, msg, *args, **kwargs):
+  def fatal(self, msg, *args, **kwargs) -> None:
     """在日志中输出致命错误信息"""
-    pass
+    ...
 
-  def _case(self, msg, *args, **kwargs):
+  def _case(self, msg, *args, **kwargs) -> None:
     """在日志中输出测试用例标题"""
-    pass
+    ...
 
-  def _unit(self, msg, *args, **kwargs):
+  def _unit(self, msg, *args, **kwargs) -> None:
     """在日志中输出测试单元标题"""
-    pass
+    ...
 
-  def step(self, msg, *args, **kwargs):
+  def step(self, msg, *args, **kwargs) -> None:
     """在日志中输出测试步骤"""
-    pass
+    ...
 
-  def _pass(self, msg, *args, **kwargs):
+  def _pass(self, msg, *args, **kwargs) -> None:
     """在日志中输出测试成功"""
-    pass
+    ...
 
-  def _fail(self, msg, *args, **kwargs):
+  def _fail(self, msg, *args, **kwargs) -> None:
     """在日志中输出测试失败"""
-    pass
+    ...
 

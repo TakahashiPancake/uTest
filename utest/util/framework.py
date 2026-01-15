@@ -1,10 +1,9 @@
 import inspect
-from typing import Literal
-import utest.util.path as path
+from typing import Literal as _Literal
 
 
 # 文件写模式
-write_modes = Literal[
+_write_modes = _Literal[
   "w", "wt", "tw",
   "a", "at", "ta",
   "x", "xt", "tx",
@@ -14,7 +13,7 @@ write_modes = Literal[
 ]
 
 # 文件读模式
-read_modes = Literal[
+_read_modes = _Literal[
   "r", "rt", "tr",
   "r+", "+r", "rt+", "r+t", "+rt", "tr+", "t+r", "+tr",
   "U", "rU", "Ur", "rtU", "rUt", "Urt", "trU", "tUr", "Utr"
@@ -40,7 +39,7 @@ def read_json_config(
 
   # 读取配置文件
   with open(
-    path.abs_path_in_framework(config_path),
+    config_path,
     'r',
     encoding=encoding
   ) as config_file:
@@ -69,7 +68,7 @@ def read_yaml_config(
 
   # 读取配置文件
   with open(
-    path.abs_path_in_framework(config_path),
+    config_path,
     'r',
     encoding=encoding
   ) as config_file:
@@ -81,7 +80,7 @@ def read_yaml_config(
 def write_string_to_file(
   content: str,
   file_path: str,
-  mode: write_modes = 'wt',
+  mode: _write_modes = 'wt',
   encoding: str = 'utf-8'
 ) -> None:
   """

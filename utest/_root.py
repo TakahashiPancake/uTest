@@ -1,8 +1,8 @@
 import os
 
-def abs_path_in_framework(path: str) -> str:
+def abs_path(path: str | None) -> str:
   """
-  获取包内绝对路径
+  返回包内文件的绝对路径
 
   Args:
     path:   路径
@@ -11,13 +11,16 @@ def abs_path_in_framework(path: str) -> str:
     return: 绝对路径
 
   """
-  if os.path.isabs(path):
+  # 获取包的根目录
+  root_path = os.path.dirname(os.path.abspath(__file__))
+
+  if path is None:
+    return root_path
+
+  elif os.path.isabs(path):
     return path
 
   else:
-    # 获取包的根目录
-    pkg_root_path = os.path.dirname(os.path.abspath(__file__))
-
     # 返回绝对路径
-    return str(os.path.join(pkg_root_path, path))
+    return str(os.path.join(root_path, path))
 

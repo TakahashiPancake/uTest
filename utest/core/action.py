@@ -1,12 +1,18 @@
 import inspect
 from .base import Base
-from .case import TestCase
+
+
+# 在本模块里，TestCase类是一个Base类
+TestCase = Base
 
 
 class Action(object):
-  """动作基类"""
+  """
+  动作类
 
+  - 在动作类中可以调用测试用例类中的日志方法以及断言方法
 
+  """
   # 测试用例实例
   _case_instance = None
 
@@ -15,9 +21,9 @@ class Action(object):
     """
     构造函数
 
-    1. 目的是获取测试用例实例
+    1. 获取测试用例实例
 
-    2. 从测试用例实例导入日志方法和断言方法
+    2. 从测试用例实例中导入日志方法和断言方法
 
     Returns:
       return: None
@@ -80,6 +86,7 @@ class Action(object):
       return: 无
 
     """
+    # 声明并导入日志方法
     self.trace   = case.trace
     self.info    = case.info
     self.warning = case.warning
@@ -101,6 +108,12 @@ class Action(object):
       return: 无
 
     """
+    # 从测试用例中导入断言方法
+    for method in dir(case):
+      if method.startswith('assert'):
+        setattr(self, method, getattr(case, method))
+
+    # 声明并导入断言方法
     self.assertTrue           = case.assertTrue
     self.assertFalse          = case.assertFalse
     self.assertEqual          = case.assertEqual
@@ -131,25 +144,4 @@ class Action(object):
     self.assertLogs           = case.assertLogs
     self.assertIsInstance     = case.assertIsInstance
     self.assertNotIsInstance  = case.assertNotIsInstance
-
-    # 弃用的方法
-    try:
-      self.failUnlessEqual        = case.failUnlessEqual
-      self.assertEquals           = case.assertEquals
-      self.failIfEqual            = case.failIfEqual
-      self.assertNotEquals        = case.assertNotEquals
-      self.failUnlessAlmostEqual  = case.failUnlessAlmostEqual
-      self.assertAlmostEquals     = case.assertAlmostEquals
-      self.failIfAlmostEqual      = case.failIfAlmostEqual
-      self.assertNotAlmostEquals  = case.assertNotAlmostEquals
-      self.failUnless             = case.failUnless
-      self.assert_                = case.assert_
-      self.failUnlessRaises       = case.failUnlessRaises
-      self.failIf                 = case.failIf
-      self.assertRaisesRegexp     = case.assertRaisesRegexp
-      self.assertRegexpMatches    = case.assertRegexpMatches
-      self.assertNotRegexpMatches = case.assertNotRegexpMatches
-
-    except AttributeError:
-      pass
 
