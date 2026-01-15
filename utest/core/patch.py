@@ -1,4 +1,6 @@
 import types
+import unittest
+import logging
 import utest.util.framework as framework_util
 
 
@@ -6,7 +8,44 @@ class Patcher(object):
   """补丁"""
 
   @staticmethod
-  def patch_logging(config_path, encoding='utf-8'):
+  def _set_log_level(
+    func_name: str,
+    name: str,
+    level: int
+  ) -> None:
+    """
+    添加自定义日志级别
+
+    Args:
+      func_name: 方法名
+      name:      日志名称
+      level:     日志级别
+
+    Returns:
+      return:    无
+
+    """
+    # 添加新的日志级别
+    logging.addLevelName(level, name)
+
+    # 动态创建方法
+    func_code = compile(
+      f'''def {func_name}(self, msg, *args, **kwargs):
+        if self.isEnabledFor({level}):
+          self._log({level}, msg, args, **kwargs)
+      ''',
+      '<string>',
+      'exec'
+    ).co_consts[0]
+    func = types.FunctionType(func_code, globals())
+
+    # 绑定方法到类
+    setattr(logging.Logger, func_name, func)
+
+  def patch_logging_by_config_file(self,
+    config_path: str,
+    encoding: str = 'utf-8'
+  ):
     """
     修补logging模块
 
@@ -18,43 +57,9 @@ class Patcher(object):
       return:      无
 
     """
-    import logging
-
     # 定义字段名
     more_levels  = 'more_levels'
     basic_config = 'basic_config'
-
-
-    def set_log_level(func_name, name, level):
-      """
-      添加自定义日志级别
-
-      Args:
-        func_name: 方法名
-        name:      日志名称
-        level:     日志级别
-
-      Returns:
-        return:    无
-
-      """
-      # 添加新的日志级别
-      logging.addLevelName(level, name)
-
-      # 动态创建方法
-      func_code = compile(
-        f'''def {func_name}(self, msg, *args, **kwargs):
-          if self.isEnabledFor({level}):
-            self._log({level}, msg, args, **kwargs)
-        ''',
-        '<string>',
-        'exec'
-      ).co_consts[0]
-      func = types.FunctionType(func_code, globals())
-
-      # 绑定方法到类
-      setattr(logging.Logger, func_name, func)
-
 
     if not hasattr(logging, '_patched'):
 
@@ -67,7 +72,7 @@ class Patcher(object):
       # 更多日志级别
       if more_levels in config:
         for fn in config[more_levels].keys():
-          set_log_level(fn, **config[more_levels][fn])
+          self._set_log_level(fn, **config[more_levels][fn])
 
       # 设置基本日志输出
       if basic_config in config:
@@ -86,7 +91,10 @@ class Patcher(object):
 
 
   @staticmethod
-  def patch_unittest(config_path, encoding='utf-8'):
+  def patch_unittest_by_config_file(
+    config_path: str,
+    encoding: str = 'utf-8'
+  ):
     """
     修补unittest模块
 
@@ -98,8 +106,6 @@ class Patcher(object):
       return:      无
 
     """
-    import unittest
-
     test_loader        = 'test_loader'
     test_method_prefix = 'test_method_prefix'
 
