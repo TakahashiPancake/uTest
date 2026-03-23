@@ -1,4 +1,4 @@
-__all__ = ['TestCase', 'Action']
+__all__ = ['TestCase', 'Action', 'TextTestExecutor', 'HTMLTestExecutor']
 
 
 import utest.meta as _meta
@@ -31,4 +31,5 @@ _patcher.patch_unittest_by_config_file(
 # 导入模块
 from .core.case import TestCase
 from .core.action import Action
+from .executor.executor import TextTestExecutor, HTMLTestExecutor
 
