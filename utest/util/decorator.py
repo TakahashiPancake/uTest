@@ -1,8 +1,7 @@
 import sys
 import io
 from collections.abc import Callable
-from contextlib import redirect_stdout
-from contextlib import redirect_stderr
+from contextlib import redirect_stdout, redirect_stderr
 import functools
 import utest.util.path as path_util
 import utest.util.framework as framework_util
@@ -17,7 +16,7 @@ def redirect_module_output(
 
   Args:
     module_name: 模块名称
-    output_path:   输出日志路径
+    output_path: 输出日志路径
 
   Returns:
     return: 被封装的方法

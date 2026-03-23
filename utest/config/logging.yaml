@@ -51,5 +51,5 @@ more_levels:
 # 2. 基本配置
 basic_config:
   format: '%(asctime)-16s | %(levelname)+10s | %(message)s'
-  level:  20
+  level:  10
 
