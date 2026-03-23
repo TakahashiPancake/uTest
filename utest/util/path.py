@@ -1,5 +1,5 @@
 import os
-import utest.root as _framework_root
+import utest._root as _framework_root
 
 
 class _Framework(object):

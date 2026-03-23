@@ -2,6 +2,7 @@ import types
 import unittest
 import logging
 import utest.util.framework as framework_util
+from utest.util.stream import redirect_stream
 
 
 class Patcher(object):
@@ -76,7 +77,13 @@ class Patcher(object):
 
       # 设置基本日志输出
       if basic_config in config:
-        logging.basicConfig(**config[basic_config])
+        logging.basicConfig(
+          **config[basic_config],
+          handlers = [
+            logging.StreamHandler(),
+            logging.StreamHandler(redirect_stream.buffer)
+          ]
+        )
 
       # 标记logging为patched
       setattr(logging, '_patched', True)

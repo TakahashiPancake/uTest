@@ -1,6 +1,7 @@
 {
   "requirements":[
-    "pyyaml"
+    "pyyaml",
+    "html-testRunner"
   ],
   "pip_index_url": "https://mirrors.aliyun.com/pypi/simple/"
 }
