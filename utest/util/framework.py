@@ -3,7 +3,7 @@ from typing import Literal as _Literal
 
 
 # 文件写模式
-_write_modes = _Literal[
+_write_mode = _Literal[
   "w", "wt", "tw",
   "a", "at", "ta",
   "x", "xt", "tx",
@@ -13,7 +13,7 @@ _write_modes = _Literal[
 ]
 
 # 文件读模式
-_read_modes = _Literal[
+_read_mode = _Literal[
   "r", "rt", "tr",
   "r+", "+r", "rt+", "r+t", "+rt", "tr+", "t+r", "+tr",
   "U", "rU", "Ur", "rtU", "rUt", "Urt", "trU", "tUr", "Utr"
@@ -80,7 +80,7 @@ def read_yaml_config(
 def write_string_to_file(
   content: str,
   file_path: str,
-  mode: _write_modes = 'wt',
+  mode: _write_mode = 'wt',
   encoding: str = 'utf-8'
 ) -> None:
   """

@@ -1,5 +1,6 @@
 import sys
 import io
+from typing import Any
 from contextlib import redirect_stdout
 from contextlib import redirect_stderr
 from datetime import datetime
@@ -24,7 +25,7 @@ class AutoPIP(object):
     config_path, # 必须使用json格式配置文件
     encoding = 'utf-8',
     upgrade  = False
-  ) -> ...:
+  ) -> Any:
     """
     主方法
 
@@ -45,24 +46,44 @@ class AutoPIP(object):
     import pip
 
     def printl(*args, **kwargs) -> None:
+      """输出流到stderr"""
       print(*args, **kwargs, file=sys.stderr)
 
 
     def log_print(*args, **kwargs) -> None:
+      """输出日志"""
       printl(datetime.now())
       printl(*args, **kwargs)
 
 
     def pip_cmd(args: list) -> None:
+      """
+      pip命令
+
+      Args:
+        args:   pip命令参数列表
+
+      Returns:
+        return: 无
+
+      """
       log_print('COMMAND:', 'pip', ' '.join(args), sep=' ')
       pip.main(args)
 
 
     def upgrade_pip() -> None:
+      """更新PIP"""
       pip_cmd(['install', '--upgrade', 'pip'])
 
 
     def read_pip_list() -> str:
+      """
+      读取PIP列表
+
+      Returns:
+         return: PIP列表（文本）
+
+      """
       # 定义输入输出流
       err_stream = io.StringIO()
       io_stream  = io.StringIO()
