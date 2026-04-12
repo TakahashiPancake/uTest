@@ -1,4 +1,4 @@
-import inspect
+import inspect as _inspect
 from typing import Literal as _Literal
 
 
@@ -112,7 +112,7 @@ def get_var_name(var) -> str | None:
     return: 变量名称
 
   """
-  frame = inspect.currentframe().f_back
+  frame = _inspect.currentframe().f_back
 
   for name, value in frame.f_locals.items():
     if value is var:

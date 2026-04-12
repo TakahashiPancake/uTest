@@ -1,4 +1,4 @@
-import os
+import os as _os
 import utest._root as _framework_root
 
 
@@ -33,7 +33,7 @@ def dir_path(file_path: str) -> str:
     return:    文件所在文件夹路径
 
   """
-  dir_path_ = os.path.dirname(file_path)
+  dir_path_ = _os.path.dirname(file_path)
 
   return dir_path_
 
@@ -49,12 +49,12 @@ def create_dirs(path: str) -> None:
     return: 无
 
   """
-  if not os.path.exists(path):
-     os.makedirs(path)
+  if not _os.path.exists(path):
+     _os.makedirs(path)
 
 
 def join(path: str, /, *paths: str) -> str:
   """拼接路径"""
 
-  return os.path.join(path, *paths)
+  return _os.path.join(path, *paths)
 

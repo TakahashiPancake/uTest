@@ -1,4 +1,4 @@
-import os
+import os as _os
 
 def abs_path(path: str | None) -> str:
   """
@@ -12,15 +12,15 @@ def abs_path(path: str | None) -> str:
 
   """
   # 获取包的根目录
-  root_path = os.path.dirname(os.path.abspath(__file__))
+  root_path = _os.path.dirname(_os.path.abspath(__file__))
 
   if path is None:
     return root_path
 
-  elif os.path.isabs(path):
+  elif _os.path.isabs(path):
     return path
 
   else:
     # 返回绝对路径
-    return str(os.path.join(root_path, path))
+    return str(_os.path.join(root_path, path))
 
