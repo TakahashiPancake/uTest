@@ -1,12 +1,12 @@
-import logging
-import unittest
-import utest.util as util
-import utest.meta as meta
-from .patch import patcher
+import logging as _logging
+import unittest as _unittest
+import utest.util as _util
+import utest.meta as _meta
+from .patch import patcher as _patcher
 
 
 
-class Base(unittest.TestCase):
+class Base(_unittest.TestCase):
   """
   框架基类
 
@@ -37,8 +37,8 @@ class Base(unittest.TestCase):
   def _get_logger(
     self,
     logger_name          = 'uLogger',       # uLogger是uTest框架下的日志器
-    logging_config_path  = util.path.framework.abs_path(util.path.join(
-      meta.CONFIG_DIR, meta.CONFIGs.LOGGING
+    logging_config_path  = _util.path.framework.abs_path(_util.path.join(
+      _meta.CONFIG_DIR, _meta.CONFIGs.LOGGING
     )),                                     # 配置文件路径
     config_file_encoding = 'utf-8'          # 配置文件默认用UTF-8编码
   ) -> None:
@@ -87,13 +87,13 @@ class Base(unittest.TestCase):
       )
 
     # 给logging打补丁
-    patcher.patch_logging_by_config_file(logging_config_path)
+    _patcher.patch_logging_by_config_file(logging_config_path)
 
     # 创建日志器并绑定到类
-    setattr(self, logger_name, logging.getLogger(logger_name))
+    setattr(self, logger_name, _logging.getLogger(logger_name))
 
     # 读取配置文件
-    config = util.framework.read_yaml_config(
+    config = _util.framework.read_yaml_config(
       config_path = logging_config_path,
       encoding    = config_file_encoding
     )

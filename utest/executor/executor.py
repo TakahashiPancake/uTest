@@ -1,16 +1,19 @@
-import sys
-import time
-import traceback
-from abc import ABC, abstractmethod
-from typing import LiteralString, Any
-import unittest
-from unittest import TestSuite
-from unittest.runner import TextTestResult
-import HtmlTestRunner
-from HtmlTestRunner.result import TestResult
-from utest.util.path import framework
-from utest.util.stream import redirect_stream
-from utest.core.case import TestCase
+import sys as _sys
+import time as _time
+import traceback as _traceback
+import copy as _copy
+from abc import ABC as _ABC, abstractmethod  # 导入装饰器
+from typing import LiteralString, Any        # 导入类型
+import unittest as _unittest
+from unittest import TestSuite               # 导入类型
+from unittest.runner import TextTestResult   # 导入类型
+import HtmlTestRunner as _HtmlTestRunner
+from HtmlTestRunner.result import TestResult # 导入类型
+import utest.util.path as _path
+from utest.util.stream import StreamBuffer   # 导入类型
+from utest.util.date import DateTime as _DateTime
+from utest.common.stream import stream_buffer as _stream_buffer_
+from utest.core.case import TestCase         # 导入类型
 
 
 class _PatchHTMLTestRunner(object):
@@ -37,7 +40,7 @@ class _PatchHTMLTestRunner(object):
   @staticmethod
   def start_test(self, test):
     """ Called before execute each method. """
-    self.start_time = time.time()
+    self.start_time = _time.time()
     TestResult.startTest(self, test)
 
     if self.showAll:
@@ -68,13 +71,13 @@ class _PatchHTMLTestRunner(object):
 
     if exc_type is test.failureException:
       # Skip assert*() traceback levels
-      msg_lines = traceback.format_exception(exc_type, value, tb)
+      msg_lines = _traceback.format_exception(exc_type, value, tb)
 
     if self.buffer:
       # Only try to get sys.stderr as it might not be
       # StringIO yet, e.g. when test fails during __call__
       try:
-        error = sys.stderr.getvalue()
+        error = _sys.stderr.getvalue()
       except AttributeError:
         error = None
       if error:
@@ -82,7 +85,7 @@ class _PatchHTMLTestRunner(object):
           error += '\n'
         msg_lines.append(error)
     # This is the extra magic to make sure all lines are str
-    encoding = getattr(sys.stdout, 'encoding', 'utf-8')
+    encoding = getattr(_sys.stdout, 'encoding', 'utf-8')
     lines = []
     for line in msg_lines:
       if not isinstance(line, str):
@@ -96,17 +99,21 @@ class _PatchHTMLTestRunner(object):
 # 给 html-testrunner 打补丁
 _PatchHTMLTestRunner()()
 
-
-class _TestExecutorBase(ABC):
+class _TestExecutorBase(_ABC):
   """测试执行器基类"""
 
   # 初始化测试套件
-  _suite = unittest.TestSuite()
+  _suite = _unittest.TestSuite()
 
   # 初始化测试加载器
-  _loader = unittest.TestLoader()
+  _loader = _unittest.TestLoader()
 
-  @abstractmethod
+  # 引用文本流缓存区
+  _stream_buffer = _stream_buffer_
+
+  # 保存的文本流缓存区
+  _stream_buffer_saved: StreamBuffer | None = None
+
   def __init__(self):
     """
     初始化对象
@@ -115,7 +122,10 @@ class _TestExecutorBase(ABC):
     2. ...
 
     """
-    ...
+    self._stream_buffer.clear()
+
+  def __del__(self):
+    self._stream_buffer.clear()
 
   def load_case(self, case: TestCase | Any) -> TestSuite:
     """
@@ -153,23 +163,55 @@ class _TestExecutorBase(ABC):
     """执行测试套件"""
     ...
 
-  def run(self) -> TextTestResult:
+  def run(self,
+    output: str      = './reports/',
+    report_name: str = '测试报告'
+  ) -> TextTestResult:
     """
     执行测试用例
 
-    - 默认执行所有测试用例
+    1. 默认执行所有测试用例
+
+    2. 保存缓冲区
+
+    3. 返回测试结果
+
+    Args:
+      ...
+
+    Returns:
+      return: 测试结果
 
     """
-    return self._run_suite(self._suite)
+    # 清除缓存区
+    self._stream_buffer.clear()
+
+    # 执行测试套件
+    result = self._run_suite(self._suite)
+
+    # 保存缓存区
+    self._stream_buffer_saved = _copy.deepcopy(self._stream_buffer)
+
+    # 输出缓存区到文件
+    with open(_path.join(
+      output,
+      report_name + '_' + _DateTime.get_formatted_datetime('%Y-%m-%d_%H-%M-%S') + '.log'
+    ), 'w') as f:
+      self._stream_buffer_saved.output(file=f)
+
+    # 返回测试结果
+    return result
 
 
 class TextTestExecutor(_TestExecutorBase):
   """文本测试执行器"""
 
   def __init__(self) -> None:
-    self._runner = unittest.TextTestRunner()
+    super().__init__()
+    self._runner = _unittest.TextTestRunner()
 
   def _run_suite(self, suite) -> TextTestResult:
+    self._stream_buffer.clear()
     return self._runner.run(suite)
 
 
@@ -184,7 +226,7 @@ class HTMLTestExecutor(_TestExecutorBase):
     buffer: bool          = False,
     report_title: str     = '测试报告',
     report_name: str      = '测试报告',
-    template: str         = None,
+    template: str | None  = None,
     resultclass           = None,
     add_timestamp: bool   = True,
     open_in_browser: bool = False,
@@ -194,6 +236,9 @@ class HTMLTestExecutor(_TestExecutorBase):
     """
     初始化测试执行器
 
+    1. 定义测试套件执行器
+    2. ...
+
     Args:
       ...
 
@@ -201,16 +246,15 @@ class HTMLTestExecutor(_TestExecutorBase):
       return: 无
 
     """
-    # 清空重定向缓存
-    redirect_stream.clear()
+    super().__init__()
 
     if template is None:
-      template = framework.abs_path('./external/report_template.html')
+      template = _path.framework.abs_path('./external/report_template.html')
 
-    self._runner = HtmlTestRunner.HTMLTestRunner(
+    self._runner = _HtmlTestRunner.HTMLTestRunner(
       output          = output,
       verbosity       = verbosity,
-      stream          = redirect_stream.buffer,
+      stream          = self._stream_buffer(),
       descriptions    = descriptions,
       failfast        = failfast,
       buffer          = buffer,
@@ -224,12 +268,11 @@ class HTMLTestExecutor(_TestExecutorBase):
       template_args   = template_args
     )
 
-  def __del__(self):
-    redirect_stream.clear()
-
   def _run_suite(self, suite) -> TextTestResult:
-    redirect_stream.clear()
     result = self._runner.run(suite)
+
+    # Debug
+    #print(result.stream.getvalue())
 
     return result
 

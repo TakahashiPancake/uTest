@@ -1,12 +1,11 @@
-import sys
-import io
-from typing import Any
-from contextlib import redirect_stdout
-from contextlib import redirect_stderr
-from datetime import datetime
-import utest.util as util
-import utest.util.decorator as decorator
-import utest.meta as meta
+import sys as _sys
+import io as _io
+from typing import Any # 导入类型
+from contextlib import redirect_stdout as _redirect_stdout
+from contextlib import redirect_stderr as _redirect_stderr
+from utest.util import date as _date, path as _path, framework as _framework
+import utest.util.decorator as _decorator
+import utest.meta as _meta
 
 
 class AutoPIP(object):
@@ -14,17 +13,16 @@ class AutoPIP(object):
 
   _packages_installed = False
 
-
-  @decorator.redirect_module_output(
+  @_decorator.redirect_module_output(
     module_name = 'logging',
-    output_path = util.path.framework.abs_path(util.path.join(
-      meta.LOG_DIR, meta.LOGs.AUTOPIP
+    output_path = _path.framework.abs_path(_path.join(
+      _meta.LOG_DIR, _meta.LOGs.AUTOPIP
     ))
   )
   def main(self,
-    config_path, # 必须使用json格式配置文件
-    encoding = 'utf-8',
-    upgrade  = False
+    config_path: str, # 必须使用json格式配置文件
+    encoding: str = 'utf-8',
+    upgrade: bool = False
   ) -> Any:
     """
     主方法
@@ -45,15 +43,16 @@ class AutoPIP(object):
     """
     import pip
 
-    def printl(*args, **kwargs) -> None:
+    def print_l(*args, **kwargs) -> None:
       """输出流到stderr"""
-      print(*args, **kwargs, file=sys.stderr)
+      print(*args, **kwargs, file=_sys.stderr)
 
 
     def log_print(*args, **kwargs) -> None:
       """输出日志"""
-      printl(datetime.now())
-      printl(*args, **kwargs)
+      # 输出
+      print_l(_date.DateTime.get_formatted_datetime('%Y-%m-%d %H:%M:%S.%f'))
+      print_l(*args, **kwargs)
 
 
     def pip_cmd(args: list) -> None:
@@ -85,12 +84,12 @@ class AutoPIP(object):
 
       """
       # 定义输入输出流
-      err_stream = io.StringIO()
-      io_stream  = io.StringIO()
+      err_stream = _io.StringIO()
+      io_stream  = _io.StringIO()
 
       # 执行pip命令，重定向到输入输出流
-      with redirect_stderr(err_stream):
-        with redirect_stdout(io_stream):
+      with _redirect_stderr(err_stream):
+        with _redirect_stdout(io_stream):
           pip_cmd(['list'])
 
       # 从输入输出流中读取
@@ -102,7 +101,7 @@ class AutoPIP(object):
       packages: str = io_stream.getvalue()
 
       # 输出pip列表
-      printl(log_info)
+      print_l(log_info)
       print(packages)
 
       return packages
@@ -118,15 +117,34 @@ class AutoPIP(object):
       pip_packages = read_pip_list()
 
       # 读取配置文件
-      config = util.framework.read_json_config(
+      config = _framework.read_json_config(
         config_path = config_path,
         encoding    = encoding
       )
 
       # 安装包
-      if 'requirements' in config:
-        for package in config.get('requirements'):
+      if 'required_packages' in config:
+        for package in config.get('required_packages'):
           if package.lower() not in pip_packages.lower():
+            # 通过requirements安装
+            if 'requirements' in config:
+              requirements = config.get('requirements')
+              if 'pip_index_url' in config:
+                pip_cmd([
+                  'install',
+                  '-r',
+                  _path.join(_path.framework.abs_path(_meta.CONFIG_DIR), requirements),
+                  '-i',
+                  config.get('pip_index_url')
+                ])
+              else:
+                pip_cmd([
+                  'install',
+                  '-r',
+                  _path.join(_path.framework.abs_path(_meta.CONFIG_DIR), requirements)
+                ])
+              break # 跳出遍历
+            # 无法通过requirements安装时，使用命令安装
             if 'pip_index_url' in config:
               pip_cmd(['install', '--no-input', package, '-i', config.get('pip_index_url')])
             else:

@@ -1,9 +1,9 @@
-import inspect
-from .base import Base
+import inspect as _inspect
+from .base import Base as _Base
 
 
 # 在本模块里，TestCase类是一个Base类
-TestCase = Base
+TestCase = _Base
 
 
 class Action(object):
@@ -47,7 +47,7 @@ class Action(object):
       return: 测试用例实例
 
     """
-    curr_frame = inspect.currentframe()
+    curr_frame = _inspect.currentframe()
 
     # 遍历调用栈寻找测试用例实例
     while curr_frame.f_back.f_locals.get('self') is not None:
@@ -66,9 +66,9 @@ class Action(object):
 
       curr_frame = prev_frame
 
-    # 如果没有找到测试用例实例，则创建一个Base实例当作测试用例实例
+    # 如果没有找到测试用例实例，则创建一个测试用例实例
     else:
-      case_instance = Base()
+      case_instance = TestCase()
 
     return case_instance
 

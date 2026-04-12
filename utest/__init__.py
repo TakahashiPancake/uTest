@@ -33,3 +33,6 @@ from .core.case import TestCase
 from .core.action import Action
 from .executor.executor import TextTestExecutor, HTMLTestExecutor
 
+# 设定命令行编码为UTF-8
+from utest.util.system import system as _system
+_system.set_cmd_encoding('utf-8')

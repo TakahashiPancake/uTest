@@ -1,12 +1,13 @@
-import types
-import unittest
-import logging
-import utest.util.framework as framework_util
-from utest.util.stream import redirect_stream
+import types as _types
+import unittest as _unittest
+import logging as _logging
+import utest.util.framework as _framework_util
+from utest.common.stream import stream_buffer as _stream_buffer_
 
 
 class Patcher(object):
   """补丁"""
+  _stream_buffer = _stream_buffer_
 
   @staticmethod
   def _set_log_level(
@@ -27,7 +28,7 @@ class Patcher(object):
 
     """
     # 添加新的日志级别
-    logging.addLevelName(level, name)
+    _logging.addLevelName(level, name)
 
     # 动态创建方法
     func_code = compile(
@@ -38,10 +39,10 @@ class Patcher(object):
       '<string>',
       'exec'
     ).co_consts[0]
-    func = types.FunctionType(func_code, globals())
+    func = _types.FunctionType(func_code, globals())
 
     # 绑定方法到类
-    setattr(logging.Logger, func_name, func)
+    setattr(_logging.Logger, func_name, func)
 
   def patch_logging_by_config_file(self,
     config_path: str,
@@ -62,10 +63,10 @@ class Patcher(object):
     more_levels  = 'more_levels'
     basic_config = 'basic_config'
 
-    if not hasattr(logging, '_patched'):
+    if not hasattr(_logging, '_patched'):
 
       # 读取配置文件
-      config = framework_util.read_yaml_config(
+      config = _framework_util.read_yaml_config(
         config_path = config_path,
         encoding    = encoding
       )
@@ -77,21 +78,21 @@ class Patcher(object):
 
       # 设置基本日志输出
       if basic_config in config:
-        logging.basicConfig(
+        _logging.basicConfig(
           **config[basic_config],
           handlers = [
-            logging.StreamHandler(),
-            logging.StreamHandler(redirect_stream.buffer)
+            _logging.StreamHandler(),
+            _logging.StreamHandler(self._stream_buffer())
           ]
         )
 
       # 标记logging为patched
-      setattr(logging, '_patched', True)
+      setattr(_logging, '_patched', True)
 
       # 设置logging配置文件目录
-      setattr(logging, '_config_path', config_path)
+      setattr(_logging, '_config_path', config_path)
 
-    elif getattr(logging, '_config_path') != config_path:
+    elif getattr(_logging, '_config_path') != config_path:
       raise ValueError(
         'Module logging has already been patched by another config!'
       )
@@ -116,26 +117,26 @@ class Patcher(object):
     test_loader        = 'test_loader'
     test_method_prefix = 'test_method_prefix'
 
-    if not hasattr(unittest, '_patched'):
+    if not hasattr(_unittest, '_patched'):
 
       # 读取配置文件
-      config = framework_util.read_yaml_config(
+      config = _framework_util.read_yaml_config(
         config_path = config_path,
         encoding    = encoding
       )
 
       # 更多日志级别
       if test_loader in config:
-        unittest.TestLoader.testMethodPrefix = \
+        _unittest.TestLoader.testMethodPrefix = \
           config[test_loader][test_method_prefix]
 
       # 标记unittest为patched
-      setattr(unittest, '_patched', True)
+      setattr(_unittest, '_patched', True)
 
       # 设置unittest配置文件目录
-      setattr(unittest, '_config_path', config_path)
+      setattr(_unittest, '_config_path', config_path)
 
-    elif getattr(unittest, '_config_path') != config_path:
+    elif getattr(_unittest, '_config_path') != config_path:
       raise ValueError(
         'Module unittest has already been patched by another config!'
       )
