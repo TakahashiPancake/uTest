@@ -1,7 +1,7 @@
-from .base import Base
+from .base import Base as _Base
 
 
-class TestCase(Base):
+class TestCase(_Base):
   """测试用例类"""
 
   @classmethod
@@ -14,7 +14,7 @@ class TestCase(Base):
 
     """
     # 实例化Base类，日志输出测试用例标题
-    Base()._case(cls.__name__)
+    _Base()._case(cls.__name__)
 
 
   @classmethod

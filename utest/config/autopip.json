@@ -1,5 +1,6 @@
 {
-  "requirements":[
+  "requirements": "requirements.txt",
+  "required_packages":[
     "pyyaml",
     "html-testRunner"
   ],
