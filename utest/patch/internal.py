@@ -255,6 +255,7 @@ class Patcher(object):
     """
     from unittest import TestResult
 
+    # 修补TestResult
     TestResult.errors_custom       = []
     TestResult.failures_custom     = []
     TestResult.clear_errors_custom = _PatchUnittest.clear_errors_custom
