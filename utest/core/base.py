@@ -2,7 +2,6 @@ import logging as _logging
 import unittest as _unittest
 import utest.util as _util
 import utest.meta as _meta
-from .patch import patcher as _patcher
 
 
 
@@ -85,9 +84,6 @@ class Base(_unittest.TestCase):
           func_name
         )
       )
-
-    # 给logging打补丁
-    _patcher.patch_logging_by_config_file(logging_config_path)
 
     # 创建日志器并绑定到类
     setattr(self, logger_name, _logging.getLogger(logger_name))

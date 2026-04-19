@@ -58,3 +58,6 @@ def join(path: str, /, *paths: str) -> str:
 
   return _os.path.join(path, *paths)
 
+def quote(path: str) -> str:
+  return r'"' + path + r'"'
+

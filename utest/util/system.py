@@ -34,9 +34,9 @@ class System(object):
       # Windows chcp命令
       _os.system(f'chcp {code_pages[encoding]}')
     elif self.platform.system == 'Linux':
-      pass
+      ...
     else:
-      pass
+      ...
 
 
 system = System()
