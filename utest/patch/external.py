@@ -24,19 +24,28 @@ class PatchHTMLTestRunner(object):
     from HtmlTestRunner import HTMLTestRunner
     from HtmlTestRunner.result import HtmlTestResult
 
-    # 修改 HtmlTestRunner.result.HtmlTestResult 使之能在 python 3.11.13 中运行
+    # 修改HtmlTestRunner.result.HtmlTestResult
+    # - 使之能在python 3.11.13中运行
     HtmlTestResult._exc_info_to_string = self._exc_info_to_string
 
-    # 额外修改，使测试日志更加美观
+    # 修改HtmlTestResult.startTest
+    # - 使测试日志更加美观
     HtmlTestResult.startTest = self.start_test
 
-    # 关闭错误输出
+    # 修改HTMLTestRunner.run
+    # - XML格式日志输出
     HTMLTestRunner.run = self.run_test
 
-    # 修改HtmlTestResult行为
+    # 修改HtmlTestResult
+
+    # - 添加错误到自定义列表
     HtmlTestResult.addFailure        = self.add_failure
     HtmlTestResult.addError          = self.add_error
+
+    # - 在错误输出中添加空行
     HtmlTestResult.printErrorList    = self.print_error_list
+
+    # - HtmlTestResult.callback改为输出日志
     HtmlTestResult._prepare_callback = self.prepare_callback
 
   @staticmethod
@@ -153,11 +162,10 @@ class PatchHTMLTestRunner(object):
     self.start_time = _time.time()
     _TestResult.startTest(self, test)
 
-    if self.showAll:
-      # 注释掉以下不显示标题
-      #self.stream.write(f'{self.getDescription(test)}\n')
-      #self.stream.write(' ...\n')
-      ...
+    # 注释掉以下不显示标题
+    #if self.showAll:
+    #  self.stream.write(f'{self.getDescription(test)}\n')
+    #  self.stream.write(' ...\n')
 
   @staticmethod
   def prepare_callback(
@@ -204,9 +212,6 @@ class PatchHTMLTestRunner(object):
       )
       self.stream.writeln(self.separator2)
       self.stream.writeln('%s' % test_info.get_error_info())
-
-      # 空行
-      #self.stream.writeln()
 
   @staticmethod
   def _exc_info_to_string(self, err, test) -> _LiteralString:
