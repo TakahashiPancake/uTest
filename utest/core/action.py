@@ -1,5 +1,5 @@
 import inspect as _inspect
-from .base import Base as _Base
+from utest.core.base import Base as _Base
 
 
 # 在本模块里，TestCase类是一个Base类

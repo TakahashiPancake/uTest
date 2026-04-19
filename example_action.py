@@ -1,11 +1,11 @@
 from utest import Action
 
 class TestAction(Action):
-  def action(self):
-    self.info('123')
-    self.trace('456')
+  def action_03(self):
+    self.info('test_03_01')
+    self.trace('test_03_02')
     self.assertTrue(False)
 
-if __name__ == '__main__':
-  test_action = TestAction()
-  test_action.action()
+
+test_action = TestAction()
+

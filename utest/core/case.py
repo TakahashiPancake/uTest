@@ -1,4 +1,4 @@
-from .base import Base as _Base
+from utest.core.base import Base as _Base
 
 
 class TestCase(_Base):
@@ -13,8 +13,9 @@ class TestCase(_Base):
       return: 无
 
     """
-    # 实例化Base类，日志输出测试用例标题
-    _Base()._case(cls.__name__)
+    # 日志输出测试用例标题
+    from utest.common.proto import proto
+    proto.case_(cls.__name__)
 
 
   @classmethod

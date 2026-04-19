@@ -1,6 +1,6 @@
 import sys as _sys
 import io as _io
-from collections.abc import Callable # 导入类型
+from collections.abc import Callable as _Callable
 from contextlib import redirect_stdout as _redirect_stdout, redirect_stderr as _redirect_stderr
 import functools as _func_tools
 import utest.util.path as _path
@@ -10,7 +10,7 @@ import utest.util.framework as _framework
 def redirect_module_output(
   module_name: str,
   output_path: str = None
-) -> Callable:
+) -> _Callable:
   """
   装饰器工厂 - 重定向模块输出
 

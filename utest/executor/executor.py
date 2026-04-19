@@ -1,103 +1,20 @@
-import sys as _sys
-import time as _time
-import traceback as _traceback
+import os as _os
 import copy as _copy
-from abc import ABC as _ABC, abstractmethod  # 导入装饰器
-from typing import LiteralString, Any        # 导入类型
+from abc import ABC as _ABC, abstractmethod as _abstractmethod
+from typing import Any as _Any
+import xml.etree.ElementTree as _ElementTree
 import unittest as _unittest
-from unittest import TestSuite               # 导入类型
-from unittest.runner import TextTestResult   # 导入类型
+from unittest import TestSuite as _TestSuite
+from unittest.runner import TextTestResult as _TextTestResult
 import HtmlTestRunner as _HtmlTestRunner
-from HtmlTestRunner.result import TestResult # 导入类型
+from HtmlTestRunner import HTMLTestRunner as _HTMLTestRunner
 import utest.util.path as _path
-from utest.util.stream import StreamBuffer   # 导入类型
+from utest.util.stream import StringIO as _StringIO
 from utest.util.date import DateTime as _DateTime
-from utest.common.stream import stream_buffer as _stream_buffer_
-from utest.core.case import TestCase         # 导入类型
+from utest.common.stream import sync_stream as _sync_stream
+from utest.core.case import TestCase as _TestCase
 
 
-class _PatchHTMLTestRunner(object):
-  """
-  html-testrunner 补丁
-
-  - 适配版本：
-
-    -  python          version 3.11.13
-    -  html-testrunner version 1.2.1
-
-  """
-  def __call__(self) -> None:
-    """打补丁"""
-    from HtmlTestRunner.result import HtmlTestResult
-
-    # 修改 HtmlTestRunner.result.HtmlTestResult 使之能在 python 3.11.13 中运行
-    HtmlTestResult._exc_info_to_string = self._exc_info_to_string
-
-    # 额外修改，使测试日志更加美观
-    HtmlTestResult.startTest = self.start_test
-
-
-  @staticmethod
-  def start_test(self, test):
-    """ Called before execute each method. """
-    self.start_time = _time.time()
-    TestResult.startTest(self, test)
-
-    if self.showAll:
-      self.stream.write(self.getDescription(test))
-      self.stream.write(" ...\n")
-
-  @staticmethod
-  def _exc_info_to_string(self, err, test) -> LiteralString:
-    """ Converts a sys.exc_info()-style tuple of values into a string."""
-    # if six.PY3:
-    # # It works fine in python 3
-    # try:
-    #   return super(
-    #     _HTMLTestResult,
-    #     self
-    #   )._exc_info_to_string(err, test)
-    # except AttributeError:
-    #   # We keep going using the legacy python <= 2 way
-    #   pass
-
-    # This comes directly from python2 unittest
-    exc_type, value, tb = err
-    # Skip test executor traceback levels
-    while tb and self._is_relevant_tb_level(tb):
-      tb = tb.tb_next
-
-    msg_lines = []
-
-    if exc_type is test.failureException:
-      # Skip assert*() traceback levels
-      msg_lines = _traceback.format_exception(exc_type, value, tb)
-
-    if self.buffer:
-      # Only try to get sys.stderr as it might not be
-      # StringIO yet, e.g. when test fails during __call__
-      try:
-        error = _sys.stderr.getvalue()
-      except AttributeError:
-        error = None
-      if error:
-        if not error.endswith('\n'):
-          error += '\n'
-        msg_lines.append(error)
-    # This is the extra magic to make sure all lines are str
-    encoding = getattr(_sys.stdout, 'encoding', 'utf-8')
-    lines = []
-    for line in msg_lines:
-      if not isinstance(line, str):
-        # utf8 shouldn't be hard-coded, but not sure f
-        line = line.encode(encoding)
-      lines.append(line)
-
-    return ''.join(lines)
-
-
-# 给 html-testrunner 打补丁
-_PatchHTMLTestRunner()()
 
 class _TestExecutorBase(_ABC):
   """测试执行器基类"""
@@ -109,10 +26,10 @@ class _TestExecutorBase(_ABC):
   _loader = _unittest.TestLoader()
 
   # 引用文本流缓存区
-  _stream_buffer = _stream_buffer_
+  _sync_buffer = _sync_stream
 
   # 保存的文本流缓存区
-  _stream_buffer_saved: StreamBuffer | None = None
+  _sync_buffer_saved: _StringIO | None = None
 
   def __init__(self):
     """
@@ -122,30 +39,33 @@ class _TestExecutorBase(_ABC):
     2. ...
 
     """
-    self._stream_buffer.clear()
+    self._sync_buffer.clear_buffer()
 
   def __del__(self):
-    self._stream_buffer.clear()
+    self._sync_buffer.clear_buffer()
 
-  def load_case(self, case: TestCase | Any) -> TestSuite:
+  def load(self, case: type[_TestCase], /, *cases: type[_TestCase]) -> _TestSuite:
     """
     读取测试用例
 
     Args:
       case:   测试用例
+      cases:  测试用例（复数）
 
     Returns:
-      return: 读取到的测试套件
+      return: 全部测试套件
 
     """
-    suite = self._load_case(case)
-
     # 添加到套件
-    self._suite.addTest(suite)
+    self._suite.addTest(self._load_case(case))
 
-    return suite
+    # 逐个添加剩余的
+    for case_ in cases:
+      self._suite.addTest(self._load_case(case_))
 
-  def _load_case(self, case) -> TestSuite:
+    return self._suite
+
+  def _load_case(self, case) -> _TestSuite:
     """
     加载测试用例
 
@@ -158,15 +78,15 @@ class _TestExecutorBase(_ABC):
     """
     return self._loader.loadTestsFromTestCase(case)
 
-  @abstractmethod
-  def _run_suite(self, suite) -> TextTestResult:
+  @_abstractmethod
+  def _run_suite(self, suite, dir_name) -> _TextTestResult:
     """执行测试套件"""
     ...
 
   def run(self,
     output: str      = './reports/',
     report_name: str = '测试报告'
-  ) -> TextTestResult:
+  ) -> _TextTestResult:
     """
     执行测试用例
 
@@ -184,20 +104,45 @@ class _TestExecutorBase(_ABC):
 
     """
     # 清除缓存区
-    self._stream_buffer.clear()
+    self._sync_buffer.clear_buffer()
+
+    # 记录当前时间
+    current_datetime: str = _DateTime.get_formatted_datetime('%Y-%m-%d_%H-%M-%S')
+
+    # 定义日志名称
+    log_name = report_name + '_' + current_datetime
+
+    # 定义日志保存路径
+    log_saving_dir: str = _path.join(output, log_name)
+
+    # 创建日志保存路径
+    _os.makedirs(log_saving_dir, exist_ok=True)
 
     # 执行测试套件
-    result = self._run_suite(self._suite)
+    result = self._run_suite(self._suite, dir_name = log_name)
 
     # 保存缓存区
-    self._stream_buffer_saved = _copy.deepcopy(self._stream_buffer)
+    self._sync_buffer_saved = _copy.copy(self._sync_buffer)
 
-    # 输出缓存区到文件
+    # 保存所有日志
+    xml_log_str: str = self._sync_buffer_saved.getvalue()
+    xml_log_root = _ElementTree.fromstring(xml_log_str)
+    xml_log_root_main = xml_log_root.find('MAIN')
+    test_logs: list = xml_log_root_main.findall('TEST_LOG')
+    for element in test_logs:
+      with open(_path.join(
+        log_saving_dir,
+        (element.tag + '_' + element.attrib['TEST_CASE'] + '_' + element.attrib['DATETIME']) \
+          .replace(':', '_').replace('.', '_') + '.log'
+      ), 'w') as f:
+        print(element.text, file=f)
+
+    # 保存XML格式的日志
     with open(_path.join(
-      output,
-      report_name + '_' + _DateTime.get_formatted_datetime('%Y-%m-%d_%H-%M-%S') + '.log'
+      log_saving_dir,
+      log_name + '.xml'
     ), 'w') as f:
-      self._stream_buffer_saved.output(file=f)
+      self._sync_buffer_saved.print_buffer(file=f)
 
     # 返回测试结果
     return result
@@ -210,28 +155,52 @@ class TextTestExecutor(_TestExecutorBase):
     super().__init__()
     self._runner = _unittest.TextTestRunner()
 
-  def _run_suite(self, suite) -> TextTestResult:
-    self._stream_buffer.clear()
+  def _run_suite(self, suite, dir_name) -> _TextTestResult:
+    _ = dir_name
     return self._runner.run(suite)
 
 
 class HTMLTestExecutor(_TestExecutorBase):
   """HTML测试执行器"""
 
+  class _Params(object):
+    """
+    参数
+
+    """
+    output: str | None                  = None
+    verbosity: int | None               = None
+    stream: _StringIO | None            = None
+    descriptions: bool | None           = None
+    failfast: bool | None               = None
+    buffer: bool | None                 = None
+    report_title: str | None            = None
+    report_name: str | None             = None
+    template: str | None                = None
+    resultclass: _TextTestResult | None = None
+    add_timestamp: bool | None          = None
+    open_in_browser: bool | None        = None
+    combine_reports: bool | None        = None
+    template_args: _Any                 = None
+
+  _params = _Params()
+
+  _runner: _HTMLTestRunner | None = None
+
   def __init__(self,
-    output: str           = './reports/',
-    verbosity: int        = 2,
-    descriptions: bool    = True,
-    failfast: bool        = False,
-    buffer: bool          = False,
-    report_title: str     = '测试报告',
-    report_name: str      = '测试报告',
-    template: str | None  = None,
-    resultclass           = None,
-    add_timestamp: bool   = True,
-    open_in_browser: bool = False,
-    combine_reports: bool = True,
-    template_args         = None
+    output: str                         = './reports/',
+    verbosity: int                      = 2,
+    descriptions: bool                  = True,
+    failfast: bool                      = False,
+    buffer: bool                        = False,
+    report_title: str                   = '测试报告',
+    report_name: str                    = '测试报告',
+    template: str | None                = None,
+    resultclass: _TextTestResult | None = None,
+    add_timestamp: bool                 = True,
+    open_in_browser: bool               = False,
+    combine_reports: bool               = True, #default False
+    template_args: _Any                 = None
   ) -> None:
     """
     初始化测试执行器
@@ -251,28 +220,27 @@ class HTMLTestExecutor(_TestExecutorBase):
     if template is None:
       template = _path.framework.abs_path('./external/report_template.html')
 
-    self._runner = _HtmlTestRunner.HTMLTestRunner(
-      output          = output,
-      verbosity       = verbosity,
-      stream          = self._stream_buffer(),
-      descriptions    = descriptions,
-      failfast        = failfast,
-      buffer          = buffer,
-      report_title    = report_title,
-      report_name     = report_name,
-      template        = template,
-      resultclass     = resultclass,
-      add_timestamp   = add_timestamp,
-      open_in_browser = open_in_browser,
-      combine_reports = combine_reports,
-      template_args   = template_args
-    )
+    try:
+      self._params.output          = output
+      self._params.verbosity       = verbosity
+      self._params.stream          = self._sync_buffer
+      self._params.descriptions    = descriptions
+      self._params.failfast        = failfast
+      self._params.buffer          = buffer
+      self._params.report_title    = report_title
+      self._params.report_name     = report_name
+      self._params.template        = template
+      self._params.resultclass     = resultclass
+      self._params.add_timestamp   = add_timestamp
+      self._params.open_in_browser = open_in_browser
+      self._params.combine_reports = combine_reports
+      self._params.template_args   = template_args
+    finally:
+      ...
 
-  def _run_suite(self, suite) -> TextTestResult:
+  def _run_suite(self, suite, dir_name) -> _TextTestResult:
+    self._params.output = _path.join(self._params.output, dir_name)
+    self._runner = _HtmlTestRunner.HTMLTestRunner(**vars(self._params))
     result = self._runner.run(suite)
-
-    # Debug
-    #print(result.stream.getvalue())
-
     return result
 
