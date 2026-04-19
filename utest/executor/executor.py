@@ -1,4 +1,3 @@
-import os as _os
 import copy as _copy
 from abc import ABC as _ABC, abstractmethod as _abstractmethod
 from typing import Any as _Any
@@ -85,7 +84,8 @@ class _TestExecutorBase(_ABC):
 
   def run(self,
     output: str      = './reports/',
-    report_name: str = '测试报告'
+    report_name: str = '测试报告',
+    result_name: str = '测试结果'
   ) -> _TextTestResult:
     """
     执行测试用例
@@ -109,38 +109,53 @@ class _TestExecutorBase(_ABC):
     # 记录当前时间
     current_datetime: str = _DateTime.get_formatted_datetime('%Y-%m-%d_%H-%M-%S')
 
+    # 定义报告名称
+    report_name = report_name + '_' + current_datetime
+
     # 定义日志名称
-    log_name = report_name + '_' + current_datetime
+    result_name = result_name + '_' + current_datetime
 
-    # 定义日志保存路径
-    log_saving_dir: str = _path.join(output, log_name)
+    # 定义报告保存路径
+    reports_saving_dir: str = _path.join(output, report_name)
 
-    # 创建日志保存路径
-    _os.makedirs(log_saving_dir, exist_ok=True)
+    # 创建报告保存路径
+    _path.create_dirs(reports_saving_dir)
 
     # 执行测试套件
-    result = self._run_suite(self._suite, dir_name = log_name)
+    result = self._run_suite(self._suite, dir_name = report_name)
 
     # 保存缓存区
     self._sync_buffer_saved = _copy.copy(self._sync_buffer)
 
-    # 保存所有日志
+    # 保存文本格式日志
+
+    # 读取XML测试结果
     xml_log_str: str = self._sync_buffer_saved.getvalue()
     xml_log_root = _ElementTree.fromstring(xml_log_str)
     xml_log_root_main = xml_log_root.find('MAIN')
     test_logs: list = xml_log_root_main.findall('TEST_LOG')
+
     for element in test_logs:
+      # 定义日志名称
+      log_name = (element.attrib['TEST_CASE'] + '_' + element.attrib['DATETIME']) \
+        .replace(':', '_').replace('.', '_')
+
+      # 定义日志保存路径
+      logs_saving_dir: str = _path.join(reports_saving_dir, log_name)
+
+      # 创建日志保存路径
+      _path.create_dirs(logs_saving_dir)
+
       with open(_path.join(
-        log_saving_dir,
-        (element.tag + '_' + element.attrib['TEST_CASE'] + '_' + element.attrib['DATETIME']) \
-          .replace(':', '_').replace('.', '_') + '.log'
+        logs_saving_dir,
+        log_name + '.log'
       ), 'w') as f:
         print(element.text, file=f)
 
-    # 保存XML格式的日志
+    # 保存XML格式的测试结果
     with open(_path.join(
-      log_saving_dir,
-      log_name + '.xml'
+      reports_saving_dir,
+      result_name + '.xml'
     ), 'w') as f:
       self._sync_buffer_saved.print_buffer(file=f)
 
@@ -148,16 +163,12 @@ class _TestExecutorBase(_ABC):
     return result
 
 
-class TextTestExecutor(_TestExecutorBase):
+class TextTestExecutor(_TestExecutorBase, _ABC):
   """文本测试执行器"""
 
   def __init__(self) -> None:
     super().__init__()
     self._runner = _unittest.TextTestRunner()
-
-  def _run_suite(self, suite, dir_name) -> _TextTestResult:
-    _ = dir_name
-    return self._runner.run(suite)
 
 
 class HTMLTestExecutor(_TestExecutorBase):
