@@ -1,3 +1,6 @@
-from utest.util.stream import StreamBuffer as _StreamBuffer
+import sys as _sys
+from utest.util.stream import StringIO as _StringIO
 
-stream_buffer = _StreamBuffer()
+# 创建一个同步输入输出流
+sync_stream = _StringIO(sync_output = _sys.stderr)
+

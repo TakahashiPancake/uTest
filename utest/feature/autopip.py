@@ -1,6 +1,6 @@
 import sys as _sys
 import io as _io
-from typing import Any # 导入类型
+from typing import Any as _Any
 from contextlib import redirect_stdout as _redirect_stdout
 from contextlib import redirect_stderr as _redirect_stderr
 from utest.util import date as _date, path as _path, framework as _framework
@@ -23,7 +23,7 @@ class AutoPIP(object):
     config_path: str, # 必须使用json格式配置文件
     encoding: str = 'utf-8',
     upgrade: bool = False
-  ) -> Any:
+  ) -> _Any:
     """
     主方法
 
@@ -41,12 +41,11 @@ class AutoPIP(object):
       return:      无
 
     """
-    import pip
+    import ensurepip
 
     def print_l(*args, **kwargs) -> None:
       """输出流到stderr"""
       print(*args, **kwargs, file=_sys.stderr)
-
 
     def log_print(*args, **kwargs) -> None:
       """输出日志"""
@@ -54,6 +53,20 @@ class AutoPIP(object):
       print_l(_date.DateTime.get_formatted_datetime('%Y-%m-%d %H:%M:%S.%f'))
       print_l(*args, **kwargs)
 
+    def ensure_pip() -> None:
+      log_print('Insuring PIP')
+      try:
+        ensurepip.bootstrap()
+        log_print('PIP installed successfully')
+      except Exception as e:
+        raise e
+
+    # 确保pip已安装
+    try:
+      pip = __import__('pip')
+    except ImportError:
+      ensure_pip()
+      pip = __import__('pip')
 
     def pip_cmd(args: list) -> None:
       """
@@ -73,6 +86,7 @@ class AutoPIP(object):
     def upgrade_pip() -> None:
       """更新PIP"""
       pip_cmd(['install', '--upgrade', 'pip'])
+
 
 
     def read_pip_list() -> str:
