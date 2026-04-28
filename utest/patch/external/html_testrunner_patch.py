@@ -12,7 +12,7 @@ from utest.patch.base import PatcherBase as _PatcherBase
 
 class ResultPatch(_PatcherBase):
 
-  _patched_class = _HtmlTestResult
+  _class_to_patch = _HtmlTestResult
 
   @staticmethod
   def addFailure(self, test, err):
@@ -141,7 +141,7 @@ class ResultPatch(_PatcherBase):
 class RunnerPatch(_PatcherBase):
 
   # 被打补丁的类
-  _patched_class = _HTMLTestRunner
+  _class_to_patch = _HTMLTestRunner
 
   @staticmethod
   def run(self, test):
