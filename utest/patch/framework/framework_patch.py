@@ -7,7 +7,7 @@ class FrameworkPatch(_PatcherBase):
   _class_to_patch = _TestCase
 
   @staticmethod
-  def tear_down(self) -> None:
+  def tearDown(self) -> None:
     _ = self
     ...
 
