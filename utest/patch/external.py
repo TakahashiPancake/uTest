@@ -63,7 +63,7 @@ class PatchHTMLTestRunner(object):
       # XML根
       print('<TEST_RESULT>', file=_sync_stream)
 
-      # 将头部输出到XML标签内
+      # 将XML头部输出到XML根内
       # XML标签开始
       print('<HEADER>', file=_sync_stream)
       self.stream.writeln("Running tests... ")
@@ -82,7 +82,7 @@ class PatchHTMLTestRunner(object):
       # self.stream.writeln(result.separator2)
       print('</MAIN>', file=_sync_stream)
 
-      # 将足部输出到标签内
+      # 将XML足部输出到XML根内
       print('<FOOTER>', file=_sync_stream)
       print('<TEST_INFO>', file=_sync_stream)
       run = result.testsRun
