@@ -4,142 +4,18 @@ from datetime import datetime as _datetime
 import traceback as _traceback
 from typing import LiteralString as _LiteralString
 from HtmlTestRunner.result import TestResult as _TestResult
-from utest.common.stream import sync_stream as _sync_stream
+from HtmlTestRunner.result import HtmlTestResult as _HtmlTestResult
+from HtmlTestRunner.runner import HTMLTestRunner as _HTMLTestRunner
+from utest.common.stream import sync_output_stream as _sync_stream
 from utest.common.proto import proto as _proto
+from utest.patch.base import PatcherBase as _PatcherBase
 
+class ResultPatch(_PatcherBase):
 
-
-class PatchHTMLTestRunner(object):
-  """
-  html-testrunner 补丁
-
-  - 适配版本：
-
-    -  python          version 3.11.13
-    -  html-testrunner version 1.2.1
-
-  """
-  def __call__(self) -> None:
-    """打补丁"""
-    from HtmlTestRunner import HTMLTestRunner
-    from HtmlTestRunner.result import HtmlTestResult
-
-    # 修改HtmlTestRunner.result.HtmlTestResult
-    # - 使之能在python 3.11.13中运行
-    HtmlTestResult._exc_info_to_string = self._exc_info_to_string
-
-    # 修改HtmlTestResult.startTest
-    # - 使测试日志更加美观
-    HtmlTestResult.startTest = self.start_test
-
-    # 修改HTMLTestRunner.run
-    # - XML格式日志输出
-    HTMLTestRunner.run = self.run_test
-
-    # 修改HtmlTestResult
-
-    # - 添加错误到自定义列表
-    HtmlTestResult.addFailure        = self.add_failure
-    HtmlTestResult.addError          = self.add_error
-
-    # - 在错误输出中添加空行
-    HtmlTestResult.printErrorList    = self.print_error_list
-
-    # - HtmlTestResult.callback改为输出日志
-    HtmlTestResult._prepare_callback = self.prepare_callback
+  _class_to_patch = _HtmlTestResult
 
   @staticmethod
-  def run_test(self, test):
-    """ Runs the given testcase or testsuite. """
-    try:
-      result = self._make_result()
-      result.failfast = self.failfast
-      if hasattr(test, 'properties'):
-        # junit testsuite properties
-        result.properties = test.properties
-
-      # 输出XML格式
-
-      # XML根
-      print('<TEST_RESULT>', file=_sync_stream)
-
-      # 将头部输出到XML标签内
-      # XML标签开始
-      print('<HEADER>', file=_sync_stream)
-      self.stream.writeln("Running tests... ")
-      self.stream.writeln(result.separator2)
-      print('</HEADER>', file=_sync_stream)
-
-
-      print('<MAIN>', file=_sync_stream)
-      self.start_time = _datetime.now()
-      test(result)
-      stop_time = _datetime.now()
-      self.time_taken = stop_time - self.start_time
-
-      # 注释掉以下行关闭错误自动输出
-      #result.printErrors()
-      # self.stream.writeln(result.separator2)
-      print('</MAIN>', file=_sync_stream)
-
-      # 将足部输出到标签内
-      print('<FOOTER>', file=_sync_stream)
-      print('<TEST_INFO>', file=_sync_stream)
-      run = result.testsRun
-      self.stream.writeln("Ran {} test{} in {}".format(
-        run,
-        run != 1 and "s" or "", str(self.time_taken)[:7]
-      ))
-      self.stream.writeln()
-
-      expected_fails = len(result.expectedFailures)
-      unexpected_successes = len(result.unexpectedSuccesses)
-      skipped = len(result.skipped)
-
-      infos = []
-      if not result.wasSuccessful():
-        self.stream.writeln("FAILED")
-        failed, errors = map(len, (result.failures, result.errors))
-        if failed:
-          infos.append("Failures={0}".format(failed))
-        if errors:
-          infos.append("Errors={0}".format(errors))
-      else:
-        self.stream.writeln("OK")
-
-      if skipped:
-        infos.append("Skipped={}".format(skipped))
-      if expected_fails:
-        infos.append("Expected Failures={}".format(expected_fails))
-      if unexpected_successes:
-        infos.append("Unexpected Successes={}".format(unexpected_successes))
-
-      if infos:
-        self.stream.writeln(" ({})".format(", ".join(infos)))
-      else:
-        self.stream.writeln("\n")
-      print('</TEST_INFO>', file=_sync_stream)
-
-      self.stream.writeln()
-      self.stream.writeln('Generating HTML reports... ')
-      result.generate_reports(self)
-
-      # XML标签结束
-      print('</FOOTER>', file=_sync_stream)
-
-      # XML结束
-      print('</TEST_RESULT>', file=_sync_stream)
-
-      if self.open_in_browser:
-        import webbrowser
-        for report in result.report_files:
-          webbrowser.open_new_tab('file://' + report)
-    finally:
-      pass
-    return result
-
-  @staticmethod
-  def add_failure(self, test, err):
+  def addFailure(self, test, err):
     """ Called when a test method fails. """
     self._save_output_data()
     test_info = self.infoclass(self, test, self.infoclass.FAILURE, err)
@@ -148,7 +24,7 @@ class PatchHTMLTestRunner(object):
     self._prepare_callback(test_info, self.failures_custom, 'FAIL', 'F')
 
   @staticmethod
-  def add_error(self, test, err):
+  def addError(self, test, err):
     """" Called when a test method raises an error. """
     self._save_output_data()
     test_info = self.infoclass(self, test, self.infoclass.ERROR, err)
@@ -157,7 +33,7 @@ class PatchHTMLTestRunner(object):
     self._prepare_callback(test_info, self.errors_custom, 'ERROR', 'E')
 
   @staticmethod
-  def start_test(self, test):
+  def startTest(self, test):
     """ Called before execute each method. """
     self.start_time = _time.time()
     _TestResult.startTest(self, test)
@@ -168,7 +44,7 @@ class PatchHTMLTestRunner(object):
     #  self.stream.write(' ...\n')
 
   @staticmethod
-  def prepare_callback(
+  def _prepare_callback(
     self, test_info, target_list, verbose_str, short_str
   ):
     """ Appends an 'info class' to the given target list and sets a
@@ -197,7 +73,7 @@ class PatchHTMLTestRunner(object):
     self.callback = callback
 
   @staticmethod
-  def print_error_list(self, flavour, errors):
+  def printErrorList(self, flavour, errors):
     """
     Writes information about the FAIL or ERROR to the stream.
     """
@@ -260,4 +136,99 @@ class PatchHTMLTestRunner(object):
       lines.append(line)
 
     return ''.join(lines)
+
+
+class RunnerPatch(_PatcherBase):
+
+  # 被打补丁的类
+  _class_to_patch = _HTMLTestRunner
+
+  @staticmethod
+  def run(self, test):
+    """ Runs the given testcase or testsuite. """
+    try:
+      result = self._make_result()
+      result.failfast = self.failfast
+      if hasattr(test, 'properties'):
+        # junit testsuite properties
+        result.properties = test.properties
+
+      # 输出XML格式
+
+      # XML根
+      print('<TEST_RESULT>', file=_sync_stream)
+
+      # 将XML头部输出到XML根内
+      # XML标签开始
+      print('<HEADER>', file=_sync_stream)
+      self.stream.writeln("Running tests... ")
+      self.stream.writeln(result.separator2)
+      print('</HEADER>', file=_sync_stream)
+
+      print('<MAIN>', file=_sync_stream)
+      self.start_time = _datetime.now()
+      test(result)
+      stop_time = _datetime.now()
+      self.time_taken = stop_time - self.start_time
+
+      # 注释掉以下行关闭错误自动输出
+      # result.printErrors()
+      # self.stream.writeln(result.separator2)
+      print('</MAIN>', file=_sync_stream)
+
+      # 将XML足部输出到XML根内
+      print('<FOOTER>', file=_sync_stream)
+      print('<TEST_INFO>', file=_sync_stream)
+      run = result.testsRun
+      self.stream.writeln("Ran {} test{} in {}".format(
+        run,
+        run != 1 and "s" or "", str(self.time_taken)[:7]
+      ))
+      self.stream.writeln()
+
+      expected_fails = len(result.expectedFailures)
+      unexpected_successes = len(result.unexpectedSuccesses)
+      skipped = len(result.skipped)
+
+      infos = []
+      if not result.wasSuccessful():
+        self.stream.writeln("FAILED")
+        failed, errors = map(len, (result.failures, result.errors))
+        if failed:
+          infos.append("Failures={0}".format(failed))
+        if errors:
+          infos.append("Errors={0}".format(errors))
+      else:
+        self.stream.writeln("OK")
+
+      if skipped:
+        infos.append("Skipped={}".format(skipped))
+      if expected_fails:
+        infos.append("Expected Failures={}".format(expected_fails))
+      if unexpected_successes:
+        infos.append("Unexpected Successes={}".format(unexpected_successes))
+
+      if infos:
+        self.stream.writeln(" ({})".format(", ".join(infos)))
+      else:
+        self.stream.writeln("\n")
+      print('</TEST_INFO>', file=_sync_stream)
+
+      self.stream.writeln()
+      self.stream.writeln('Generating HTML reports... ')
+      result.generate_reports(self)
+
+      # XML标签结束
+      print('</FOOTER>', file=_sync_stream)
+
+      # XML结束
+      print('</TEST_RESULT>', file=_sync_stream)
+
+      if self.open_in_browser:
+        import webbrowser
+        for report in result.report_files:
+          webbrowser.open_new_tab('file://' + report)
+    finally:
+      pass
+    return result
 

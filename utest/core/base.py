@@ -1,7 +1,7 @@
-import logging as _logging
 import unittest as _unittest
 import utest.util as _util
 import utest.meta as _meta
+from utest.common.logger import u_logger as _u_logger
 
 
 
@@ -16,6 +16,10 @@ class Base(_unittest.TestCase):
   3. 声明日志方法
 
   """
+
+  # 引用日志器
+  _logger = _u_logger
+
   def __init__(self, methodName='runTest') -> None:
     """
     构造函数
@@ -35,17 +39,15 @@ class Base(_unittest.TestCase):
 
   def _get_logger(
     self,
-    logger_name          = 'uLogger',       # uLogger是uTest框架下的日志器
     logging_config_path  = _util.path.framework.abs_path(_util.path.join(
       _meta.CONFIG_DIR, _meta.CONFIGs.LOGGING
     )),                                     # 配置文件路径
-    config_file_encoding = 'utf-8'          # 配置文件默认用UTF-8编码
+    config_file_encoding = 'utf-8'          # 配置文件默认用'UTF-8'编码
   ) -> None:
     """
     创建日志器
 
     Args:
-      logger_name:          日志器名称
       logging_config_path:  日志器配置文件路径
       config_file_encoding: 配置文件编码
 
@@ -58,7 +60,7 @@ class Base(_unittest.TestCase):
 
     def add_func_2_obj(
       obj: object,
-      instance_name: str,
+      instance: object,
       func_name: str
     ) -> None:
       """
@@ -66,7 +68,7 @@ class Base(_unittest.TestCase):
 
       Args:
         obj:           对象
-        instance_name: 实例名称
+        instance:      实例名称
         func_name:     方法名称
 
       Returns:
@@ -76,17 +78,8 @@ class Base(_unittest.TestCase):
       setattr(
         obj,
         func_name,
-        getattr(
-          getattr(
-            obj,
-            instance_name
-          ),
-          func_name
-        )
+        getattr(instance, func_name)
       )
-
-    # 创建日志器并绑定到类
-    setattr(self, logger_name, _logging.getLogger(logger_name))
 
     # 读取配置文件
     config = _util.framework.read_yaml_config(
@@ -97,7 +90,7 @@ class Base(_unittest.TestCase):
     # 导入更多日志级别
     if more_levels in config:
       for fn in config[more_levels].keys():
-        add_func_2_obj(self, logger_name, fn)
+        add_func_2_obj(self, self._logger, fn)
 
     # 导入logging内置日志级别
     for fn in [
@@ -105,7 +98,7 @@ class Base(_unittest.TestCase):
       'warning',
       'error'
     ]:
-      add_func_2_obj(self, logger_name, fn)
+      add_func_2_obj(self, self._logger, fn)
 
 
   def trace(self, msg, *args, **kwargs) -> None:
