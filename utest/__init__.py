@@ -5,7 +5,7 @@ import utest.meta as _meta
 import utest.util.path as _path
 
 # 安装模块
-from .feature.autopip import autopip as _autopip
+from utest.feature.autopip import autopip as _autopip
 _autopip.main(
   config_path = _path.framework.abs_path(_path.join(
     _meta.CONFIG_DIR, _meta.CONFIGs.AUTOPIP
@@ -13,39 +13,40 @@ _autopip.main(
 )
 
 # 修补软件包
-from utest.patch.internal import patcher as _patcher_internal
+from utest.patch.internal import patch as _internal_patch
+_internal_patch()
 
 # 修补框架
-_patcher_internal.patch_framework()
+from utest.patch.framework import patch as _framework_patch
 
 # 修补logging
-_patcher_internal.patch_logging_by_config_file(
+from utest.patch.internal import \
+  patch_logging_by_config_file as _patch_logging_by_config_file
+_patch_logging_by_config_file(
   config_path = _path.framework.abs_path(_path.join(
     _meta.CONFIG_DIR, _meta.CONFIGs.LOGGING
   ))
 )
 
 # 修补unittest
-_patcher_internal.patch_unittest()
-_patcher_internal.patch_unittest_by_config_file(
+from utest.patch.internal import \
+  patch_unittest_by_config_file as _patch_unittest_by_config_file
+_patch_unittest_by_config_file(
   config_path = _path.framework.abs_path(_path.join(
     _meta.CONFIG_DIR, _meta.CONFIGs.UNITTEST
   ))
 )
 
-from utest.patch.external import HtmlTestRunnerRunnerPatch as _HtmlTestRunnerRunnerPatch, \
-  HtmlTestRunnerResultPatch as _HtmlTestRunnerResultPatch
-
-# 修补html-testrunner
-_HtmlTestRunnerRunnerPatch()()
-_HtmlTestRunnerResultPatch()()
+# 修补外部库
+from utest.patch.external import patch as _external_patch
+_external_patch()
 
 # 设定命令行编码为UTF-8
 from utest.util.system import system as _system
 _system.set_cmd_encoding('utf-8')
 
 # 导入模块
-from .core.case import TestCase
-from .core.action import Action
-from .executor.executor import TextTestExecutor, HTMLTestExecutor
+from utest.core.case import TestCase
+from utest.core.action import Action
+from utest.executor.executor import TextTestExecutor, HTMLTestExecutor
 
