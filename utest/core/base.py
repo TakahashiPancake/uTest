@@ -42,7 +42,7 @@ class Base(_unittest.TestCase):
     logging_config_path  = _util.path.framework.abs_path(_util.path.join(
       _meta.CONFIG_DIR, _meta.CONFIGs.LOGGING
     )),                                     # 配置文件路径
-    config_file_encoding = 'utf-8'          # 配置文件默认用'UTF-8编码
+    config_file_encoding = 'utf-8'          # 配置文件默认用'UTF-8'编码
   ) -> None:
     """
     创建日志器
