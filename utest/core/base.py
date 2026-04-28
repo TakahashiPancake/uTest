@@ -17,6 +17,7 @@ class Base(_unittest.TestCase):
 
   """
 
+  # 引用日志器
   _logger = _u_logger
 
   def __init__(self, methodName='runTest') -> None:
