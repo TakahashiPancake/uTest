@@ -6,7 +6,7 @@ from unittest import TestCase as _TestCase
 import unittest as _unittest
 import utest.util.framework as framework_util
 from utest.patch.base import PatcherBase as _PatcherBase
-from utest.common.stream import sync_stream as _sync_buffer
+from utest.common.stream import sync_output_stream as _sync_buffer
 
 
 class SuitePatch(_PatcherBase):

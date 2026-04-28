@@ -1,4 +1,4 @@
-from utest.common.stream import sync_stream as _sync_output_stream
+from utest.common.stream import sync_output_stream as _sync_output_stream
 
 
 def _set_log_level(

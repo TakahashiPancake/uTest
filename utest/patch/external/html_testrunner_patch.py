@@ -6,7 +6,7 @@ from typing import LiteralString as _LiteralString
 from HtmlTestRunner.result import TestResult as _TestResult
 from HtmlTestRunner.result import HtmlTestResult as _HtmlTestResult
 from HtmlTestRunner.runner import HTMLTestRunner as _HTMLTestRunner
-from utest.common.stream import sync_stream as _sync_stream
+from utest.common.stream import sync_output_stream as _sync_stream
 from utest.common.proto import proto as _proto
 from utest.patch.base import PatcherBase as _PatcherBase
 

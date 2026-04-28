@@ -10,7 +10,7 @@ from HtmlTestRunner import HTMLTestRunner as _HTMLTestRunner
 import utest.util.path as _path
 from utest.util.stream import StringIO as _StringIO
 from utest.util.date import DateTime as _DateTime
-from utest.common.stream import sync_stream as _sync_stream
+from utest.common.stream import sync_output_stream as _sync_stream
 from utest.core.case import TestCase as _TestCase
 
 
