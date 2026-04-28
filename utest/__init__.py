@@ -33,10 +33,12 @@ _patcher_internal.patch_unittest_by_config_file(
   ))
 )
 
-from utest.patch.external import PatchHTMLTestRunner as _PatchHTMLTestRunner
+from utest.patch.external import HtmlTestRunnerRunnerPatch as _HtmlTestRunnerRunnerPatch, \
+  HtmlTestRunnerResultPatch as _HtmlTestRunnerResultPatch
 
 # 修补html-testrunner
-_PatchHTMLTestRunner()()
+_HtmlTestRunnerRunnerPatch()()
+_HtmlTestRunnerResultPatch()()
 
 # 设定命令行编码为UTF-8
 from utest.util.system import system as _system
