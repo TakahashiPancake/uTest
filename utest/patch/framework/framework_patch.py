@@ -2,7 +2,7 @@ from utest.patch.base import PatcherBase as _PatcherBase
 from utest.core.case import TestCase as _TestCase
 
 
-class FrameworkPatch(_PatcherBase):
+class TestCasePatch(_PatcherBase):
 
   _class_to_patch = _TestCase
 
