@@ -1,7 +1,9 @@
 from utest import HTMLTestExecutor
-from example_case import TC_001_Framework, TC_002_Framework
+from cases import TC_Launch_MiJia
 
 if __name__ == '__main__':
-  executor = HTMLTestExecutor()
-  executor.load(TC_001_Framework, TC_002_Framework)
-  executor.run()
+  html_executor = HTMLTestExecutor()
+  html_executor.load(TC_Launch_MiJia)
+  html_executor.run()
+
+
