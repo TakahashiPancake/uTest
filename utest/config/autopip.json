@@ -2,7 +2,8 @@
   "requirements": "requirements.txt",
   "required_packages":[
     "pyyaml",
-    "html-testRunner"
+    "html-testRunner",
+    "uiautomator2"
   ],
   "pip_index_url": "https://mirrors.aliyun.com/pypi/simple/"
 }

@@ -1,2 +1,3 @@
 html-testRunner==1.2.1
 PyYAML==6.0.3
+uiautomator2==3.5.0

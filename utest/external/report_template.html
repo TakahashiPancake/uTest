@@ -17080,7 +17080,7 @@ jQuery.event = {
         !event.isImmediatePropagationStopped() ) {
 
         // If the event is namespaced, then each handler is only invoked if it is
-        // specially universal or its namespaces are a superset of the event's.
+        // specially public or its namespaces are a superset of the event's.
         if ( !event.rnamespace || handleObj.namespace === false ||
           event.rnamespace.test( handleObj.namespace ) ) {
 
@@ -17283,7 +17283,7 @@ function leverageNative( el, type, isSetup ) {
     return;
   }
 
-  // Register the controller as a special universal handler for all event namespaces
+  // Register the controller as a special public handler for all event namespaces
   dataPriv.set( el, type, false );
   jQuery.event.add( el, type, {
     namespace: false,
