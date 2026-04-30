@@ -6,7 +6,7 @@ more_levels:
 # 1.1 TRACE级别
 # - 代替DEBUG级别
   trace:
-    name:  TRACE
+    name:  DEBUG
     level: 15
 
 # 1.2. FATAL级别
