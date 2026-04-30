@@ -18,6 +18,7 @@ _internal_patch()
 
 # 修补框架
 from utest.patch.framework import patch as _framework_patch
+_framework_patch()
 
 # 修补logging
 from utest.patch.internal import \
