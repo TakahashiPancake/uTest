@@ -144,4 +144,5 @@ class Action(object):
     self.assertLogs           = case.assertLogs
     self.assertIsInstance     = case.assertIsInstance
     self.assertNotIsInstance  = case.assertNotIsInstance
+    self.fail                 = case.fail
 
