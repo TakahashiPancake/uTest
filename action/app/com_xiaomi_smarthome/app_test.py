@@ -1,4 +1,4 @@
-import universal.device as device
+import public.device as device
 from action.common.common import ui
 from action.common.common import time
 from utest import Action

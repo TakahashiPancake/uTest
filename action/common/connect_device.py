@@ -1,5 +1,5 @@
 import uiautomator2 as u2
-import universal.device as device
+import public.device as device
 from utest import Action
 from action.common.common import time
 

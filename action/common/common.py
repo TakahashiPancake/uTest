@@ -1,4 +1,4 @@
-import universal.device as device
+import public.device as device
 from utest import Action
 import time as time_
 import random
