@@ -69,12 +69,17 @@ class SuitePatch(_PatcherBase):
             sep='', file=_sync_buffer
           )
         elif isinstance(test, _TestCase):
+          # 输出分隔符
+          result.stream.write(result.separator2)
+          result.stream.writeln()
+          result.stream.flush()
           # 执行测试用例
           test(result)
           # 输出自定义错误&自定义失败
           result.print_errors_custom()
           # 清除自定义错误&自定义失败
           result.clear_errors_custom()
+
         else:
           pass
       else:
