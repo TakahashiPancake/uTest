@@ -13,7 +13,7 @@ class Base(_unittest.TestCase):
 
   def __init__(self, methodName='runTest') -> None:
     """
-    构造函数
+    构造方法
 
     Args:
       methodName: 默认测试方法
