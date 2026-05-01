@@ -6,16 +6,8 @@ from utest.public.logger import u_logger as _u_logger
 
 
 class Base(_unittest.TestCase):
-  """
-  框架基类
+  """框架基类"""
 
-  1. 框架基类继承自unittest.TestCase
-
-  2. 包含一个创建日志器的方法
-
-  3. 声明日志方法
-
-  """
   # 引用日志器
   _logger = _u_logger
 
