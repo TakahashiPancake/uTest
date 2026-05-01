@@ -102,7 +102,7 @@ class Base(_unittest.TestCase):
 
 
   def trace(self, msg, *args, **kwargs) -> None:
-    """在日志中输出详细信息"""
+    """在日志中输出调试信息"""
     ...
 
   def info(self, msg, *args, **kwargs) -> None:
