@@ -3,6 +3,7 @@ from utest.util.date import DateTime as _DateTime
 from unittest import TestSuite as _TestSuite
 from unittest import TestResult as _TestResult
 from unittest import TestCase as _TestCase
+from unittest import TextTestResult as _TextTestResult
 import unittest as _unittest
 import utest.util.framework as framework_util
 from utest.patch.base import PatcherBase as _PatcherBase
@@ -70,7 +71,7 @@ class SuitePatch(_PatcherBase):
           )
         elif isinstance(test, _TestCase):
           # 输出分隔符
-          result.stream.write(result.separator2)
+          result.stream.write(_TextTestResult.separator2)
           result.stream.writeln()
           result.stream.flush()
           # 执行测试用例
