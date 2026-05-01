@@ -1,7 +1,7 @@
 import unittest as _unittest
 import utest.util as _util
 import utest.meta as _meta
-from utest.common.logger import u_logger as _u_logger
+from utest.public.logger import u_logger as _u_logger
 
 
 

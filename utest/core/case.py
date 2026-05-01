@@ -14,7 +14,7 @@ class TestCase(_Base):
 
     """
     # 日志输出测试用例标题
-    from utest.common.proto import proto
+    from utest.public.proto import proto
     proto.case_(cls.__name__)
 
 
