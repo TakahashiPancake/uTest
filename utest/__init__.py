@@ -16,10 +16,6 @@ _autopip.main(
 from utest.patch.internal import patch as _internal_patch
 _internal_patch()
 
-# 修补框架
-from utest.patch.framework import patch as _framework_patch
-_framework_patch()
-
 # 修补logging
 from utest.patch.internal import \
   patch_logging_by_config_file as _patch_logging_by_config_file
