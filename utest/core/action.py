@@ -20,7 +20,7 @@ from utest.core.case import TestCase as _TestCase
 from utest.public.proto import proto as _proto
 
 
-_T:_TypeVar = _TypeVar('_T')
+_T = _TypeVar('_T')
 _E = _TypeVar('_E', bound=BaseException)
 _P = _ParamSpec('_P')
 _S = _TypeVar('_S')
@@ -33,7 +33,6 @@ class Action(object):
   - 在动作类中可以调用测试用例类中的日志方法以及断言方法
 
   """
-
   @staticmethod
   def _get_case_instance() -> _TestCase:
     """
@@ -72,29 +71,29 @@ class Action(object):
   ###   日志方法
   ####################
 
-  def step(self, msg, *args, **kwargs) -> None:
+  def step(self, step: int, msg: str) -> None:
     """在日志中输出测试步骤"""
-    self._get_case_instance().step(msg, *args, **kwargs)
+    self._get_case_instance().step(step = step, msg = msg)
 
-  def trace(self, msg, *args, **kwargs) -> None:
+  def trace(self, msg: str) -> None:
     """在日志中输出调试信息"""
-    self._get_case_instance().trace(msg, *args, **kwargs)
+    self._get_case_instance().trace(msg = msg)
 
-  def info(self, msg, *args, **kwargs) -> None:
+  def info(self, msg: str) -> None:
     """在日志中输出一般信息"""
-    self._get_case_instance().info(msg, *args, **kwargs)
+    self._get_case_instance().info(msg = msg)
 
-  def warning(self, msg, *args, **kwargs) -> None:
+  def warning(self, msg: str) -> None:
     """在日志中输出警告信息"""
-    self._get_case_instance().warning(msg, *args, **kwargs)
+    self._get_case_instance().warning(msg = msg)
 
-  def error(self, msg, *args, **kwargs) -> None:
+  def error(self, msg: str) -> None:
     """在日志中输出错误信息"""
-    self._get_case_instance().error(msg, *args, **kwargs)
+    self._get_case_instance().error(msg = msg)
 
-  def fatal(self, msg, *args, **kwargs) -> None:
+  def fatal(self, msg: str) -> None:
     """在日志中输出致命错误信息"""
-    self._get_case_instance().fatal(msg, *args, **kwargs)
+    self._get_case_instance().fatal(msg = msg)
 
 
   ####################

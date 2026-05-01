@@ -100,24 +100,41 @@ class Base(_unittest.TestCase):
     ]:
       add_func_2_obj(self, self._logger, fn)
 
+  def step(self, step: int, msg: str) -> None:
+    self._step(f'{step}. {msg}')
 
-  def trace(self, msg, *args, **kwargs) -> None:
-    """在日志中输出调试信息"""
+  def trace(self, msg: str) -> None:
+    self._trace(msg)
+
+  def info(self, msg: str) -> None:
+    self._info(msg)
+
+  def warning(self, msg: str) -> None:
+    self._warning(msg)
+
+  def error(self, msg: str) -> None:
+    self._error(msg)
+
+  def fatal(self, msg: str) -> None:
+    self._fatal(msg)
+
+  def _trace(self, msg, *args, **kwargs) -> None:
+    """在日志中输出详细信息"""
     ...
 
-  def info(self, msg, *args, **kwargs) -> None:
+  def _info(self, msg, *args, **kwargs) -> None:
     """在日志中输出一般信息"""
     ...
 
-  def warning(self, msg, *args, **kwargs) -> None:
+  def _warning(self, msg, *args, **kwargs) -> None:
     """在日志中输出警告信息"""
     ...
 
-  def error(self, msg, *args, **kwargs) -> None:
+  def _error(self, msg, *args, **kwargs) -> None:
     """在日志中输出错误信息"""
     ...
 
-  def fatal(self, msg, *args, **kwargs) -> None:
+  def _fatal(self, msg, *args, **kwargs) -> None:
     """在日志中输出致命错误信息"""
     ...
 
@@ -129,7 +146,7 @@ class Base(_unittest.TestCase):
     """在日志中输出测试单元标题"""
     ...
 
-  def step(self, msg, *args, **kwargs) -> None:
+  def _step(self, msg, *args, **kwargs) -> None:
     """在日志中输出测试步骤"""
     ...
 

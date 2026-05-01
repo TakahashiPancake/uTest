@@ -5,13 +5,13 @@ more_levels:
 
 # 1.1 TRACE级别
 # - 代替DEBUG级别
-  trace:
+  _trace:
     name:  DEBUG
     level: 15
 
 # 1.2. FATAL级别
 # - 代替CRITICAL级别
-  fatal:
+  _fatal:
     name:  FATAL
     level: 55
 
@@ -32,7 +32,7 @@ more_levels:
 
 # 1.3.3 STEP级别
 # - 输出测试步骤
-  step:
+  _step:
     name:  STEP
     level: 94
 
