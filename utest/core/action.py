@@ -73,21 +73,27 @@ class Action(object):
   ####################
 
   def step(self, msg, *args, **kwargs) -> None:
+    """在日志中输出测试步骤"""
     self._get_case_instance().step(msg, *args, **kwargs)
 
   def trace(self, msg, *args, **kwargs) -> None:
+    """在日志中输出调试信息"""
     self._get_case_instance().trace(msg, *args, **kwargs)
 
   def info(self, msg, *args, **kwargs) -> None:
+    """在日志中输出一般信息"""
     self._get_case_instance().info(msg, *args, **kwargs)
 
   def warning(self, msg, *args, **kwargs) -> None:
+    """在日志中输出警告信息"""
     self._get_case_instance().warning(msg, *args, **kwargs)
 
   def error(self, msg, *args, **kwargs) -> None:
+    """在日志中输出错误信息"""
     self._get_case_instance().error(msg, *args, **kwargs)
 
   def fatal(self, msg, *args, **kwargs) -> None:
+    """在日志中输出致命错误信息"""
     self._get_case_instance().fatal(msg, *args, **kwargs)
 
 
