@@ -348,23 +348,27 @@ class Action(object):
 
   # assertDictEqual accepts only true dict instances. We can't use that here, since that would make
   # assertDictEqual incompatible with TypedDict.
-
   def assertDictEqual(self, d1: _Mapping[_Any, object], d2: _Mapping[_Any, object], msg: _Any = None) -> None:
     self._get_case_instance().assertDictEqual(d1, d2, msg = msg)
 
   if _sys.version_info < (3, 12):
-    failUnlessEqual       = assertEqual
-    assertEquals          = assertEqual
-    failIfEqual           = assertNotEqual
-    assertNotEquals       = assertNotEqual
-    failUnless            = assertTrue
-    assert_               = assertTrue
-    failIf                = assertFalse
-    failUnlessRaises      = assertRaises
-    failUnlessAlmostEqual = assertAlmostEqual
-    assertAlmostEquals    = assertAlmostEqual
-    failIfAlmostEqual = assertNotAlmostEqual
-    assertNotAlmostEquals = assertNotAlmostEqual
-    assertRegexpMatches = assertRegex
+    failUnlessEqual        = assertEqual
+    assertEquals           = assertEqual
+    failIfEqual            = assertNotEqual
+    assertNotEquals        = assertNotEqual
+    failUnless             = assertTrue
+    assert_                = assertTrue
+    failIf                 = assertFalse
+    failUnlessRaises       = assertRaises
+    failUnlessAlmostEqual  = assertAlmostEqual
+    assertAlmostEquals     = assertAlmostEqual
+    failIfAlmostEqual      = assertNotAlmostEqual
+    assertNotAlmostEquals  = assertNotAlmostEqual
+    assertRegexpMatches    = assertRegex
     assertNotRegexpMatches = assertNotRegex
-    assertRaisesRegexp = assertRaisesRegex
+    assertRaisesRegexp     = assertRaisesRegex
+    def assertDictContainsSubset(
+      self, subset: _Mapping[_Any, _Any], dictionary: _Mapping[_Any, _Any], msg: object = None
+    ) -> None:
+      self._get_case_instance().assertDictContainsSubset(subset, dictionary, msg = msg)
+
