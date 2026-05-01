@@ -101,25 +101,33 @@ class Base(_unittest.TestCase):
       add_func_2_obj(self, self._logger, fn)
 
   def step(self, step: int, msg: str) -> None:
+    """在日志中输出测试步骤"""
     self._step(f'{step}. {msg}')
 
   def trace(self, msg: str) -> None:
+    """在日志中输出调试信息"""
     self._trace(msg)
 
   def info(self, msg: str) -> None:
+    """在日志中输出一般信息"""
     self._info(msg)
 
   def warning(self, msg: str) -> None:
+    """在日志中输出警告信息"""
     self._warning(msg)
 
   def error(self, msg: str) -> None:
+    """在日志中输出错误信息"""
     self._error(msg)
 
   def fatal(self, msg: str) -> None:
+    """在日志中输出致命错误信息"""
     self._fatal(msg)
+    # 致命错误时，直接停止执行用例
+    self.fail(msg)
 
   def _trace(self, msg, *args, **kwargs) -> None:
-    """在日志中输出详细信息"""
+    """在日志中输出调试信息"""
     ...
 
   def _info(self, msg, *args, **kwargs) -> None:
