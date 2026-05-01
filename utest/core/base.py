@@ -16,7 +16,6 @@ class Base(_unittest.TestCase):
   3. 声明日志方法
 
   """
-
   # 引用日志器
   _logger = _u_logger
 
@@ -33,21 +32,23 @@ class Base(_unittest.TestCase):
     """
     super().__init__(methodName=methodName)
 
-    # 创建日志器
-    self._get_logger()
+    # 获取日志方法
+    self._get_logger_methods_by_config_file()
 
 
-  def _get_logger(
+  def _get_logger_methods_by_config_file(
     self,
+    logger = _logger,
     logging_config_path  = _util.path.framework.abs_path(_util.path.join(
       _meta.CONFIG_DIR, _meta.CONFIGs.LOGGING
     )),                                     # 配置文件路径
     config_file_encoding = 'utf-8'          # 配置文件默认用'UTF-8'编码
   ) -> None:
     """
-    创建日志器
+    从日志器获取日志方法
 
     Args:
+      logger:               日志器
       logging_config_path:  日志器配置文件路径
       config_file_encoding: 配置文件编码
 
@@ -90,7 +91,7 @@ class Base(_unittest.TestCase):
     # 导入更多日志级别
     if more_levels in config:
       for fn in config[more_levels].keys():
-        add_func_2_obj(self, self._logger, fn)
+        add_func_2_obj(self, logger, fn)
 
     # 导入logging内置日志级别
     for fn in [
@@ -98,7 +99,7 @@ class Base(_unittest.TestCase):
       'warning',
       'error'
     ]:
-      add_func_2_obj(self, self._logger, fn)
+      add_func_2_obj(self, logger, fn)
 
   def step(self, step: int, msg: str) -> None:
     """在日志中输出测试步骤"""
