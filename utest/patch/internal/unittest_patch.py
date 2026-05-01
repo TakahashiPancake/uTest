@@ -7,7 +7,7 @@ from unittest import TextTestResult as _TextTestResult
 import unittest as _unittest
 import utest.util.framework as framework_util
 from utest.patch.base import PatcherBase as _PatcherBase
-from utest.public.stream import sync_output_stream as _sync_buffer
+from utest.public.stream import sync_output_stream as _sync_output_stream
 
 
 class SuitePatch(_PatcherBase):
@@ -60,18 +60,18 @@ class SuitePatch(_PatcherBase):
               # 测试日期&测试时间
               _DateTime.get_formatted_datetime('%Y-%m-%d_%H:%M:%S.%f')
             ),
-            sep='', file=_sync_buffer
+            sep='', file=_sync_output_stream
           )
           # 执行测试套件
           test(result)
           # XML结束标签
           print(
             '</TEST_LOG>',
-            sep='', file=_sync_buffer
+            sep='', file=_sync_output_stream
           )
         elif isinstance(test, _TestCase):
           # 输出分隔符
-          result.stream.write(_TextTestResult.separator2)
+          result.stream.write(_TextTestResult.separator1)
           result.stream.writeln()
           result.stream.flush()
           # 执行测试用例
