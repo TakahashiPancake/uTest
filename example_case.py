@@ -28,3 +28,9 @@ class TC_002_Framework(TestCase):
     self.step(3, '调用action实例')
     test_action.action_03()
 
+class TC_003_Framework(TestCase):
+  def testcase(self):
+    self.step(1, '测试步骤 1')
+    self.step(2, '测试步骤 2')
+    self.step(3, '测试步骤 3')
+
