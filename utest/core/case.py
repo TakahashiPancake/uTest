@@ -65,7 +65,7 @@ class TestCase(_Base):
     self._unit(self.id().split('.')[-1])
     print(_TextTestResult.separator2, file = _sync_output_stream)
     # 执行测试单元前置步骤
-    self.info('前置条件:')
+    self._precondition('前置条件:')
     self.precondition()
     print(_TextTestResult.separator2, file=_sync_output_stream)
 
@@ -80,7 +80,7 @@ class TestCase(_Base):
     """
     # 执行测试单元后置步骤
     print(_TextTestResult.separator2, file=_sync_output_stream)
-    self.info('后置条件:')
+    self._postcondition('后置条件:')
     print(_TextTestResult.separator2, file=_sync_output_stream)
     self.postcondition()
 
