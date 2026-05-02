@@ -1,4 +1,5 @@
 import unittest as _unittest
+from logging import Logger as _Logger
 import utest.util as _util
 import utest.meta as _meta
 from utest.public.logger import u_logger as _u_logger
@@ -9,7 +10,7 @@ class Base(_unittest.TestCase):
   """框架基类"""
 
   # 引用日志器
-  _logger = _u_logger
+  _logger: _Logger = _u_logger
 
   def __init__(self, methodName='runTest') -> None:
     """
@@ -25,13 +26,13 @@ class Base(_unittest.TestCase):
     super().__init__(methodName=methodName)
 
     # 获取日志方法
-    self._get_logger_methods_by_config_file()
+    self._get_logger_methods_by_config_file(logger = self._logger)
 
 
   def _get_logger_methods_by_config_file(
     self,
-    logger = _logger,
-    logging_config_path  = _util.path.framework.abs_path(_util.path.join(
+    logger: _Logger,
+    logging_config_path: str = _util.path.framework.abs_path(_util.path.join(
       _meta.CONFIG_DIR, _meta.CONFIGs.LOGGING
     )),                                     # 配置文件路径
     config_file_encoding = 'utf-8'          # 配置文件默认用'UTF-8'编码
