@@ -21,7 +21,7 @@ class LoaderPatch(_PatcherBase):
   def getTestCaseNames(self, testCaseClass):
     """ Return a sorted sequence of method names found within testCaseClass """
 
-    def shouldIncludeMethod(attr_name):
+    def should_include_method(attr_name):
       # 添加测试方法名称
       if not (attr_name.startswith(self.testMethodPrefix) or attr_name == 'testcase'):
         return False
@@ -34,7 +34,7 @@ class LoaderPatch(_PatcherBase):
       return self.testNamePatterns is None or \
         any(_fnmatchcase(full_name, pattern) for pattern in self.testNamePatterns)
 
-    test_fn_names = list(filter(shouldIncludeMethod, dir(testCaseClass)))
+    test_fn_names = list(filter(should_include_method, dir(testCaseClass)))
     if self.sortTestMethodsUsing:
       test_fn_names.sort(key=_func_tools.cmp_to_key(self.sortTestMethodsUsing))
     return test_fn_names
