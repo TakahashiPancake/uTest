@@ -14,6 +14,7 @@ from typing import         \
   Set as _AbstractSet,     \
   TypeVar as _TypeVar
 from re import Pattern as _Pattern
+import warnings as _warnings
 from unittest.case import _AssertRaisesContext, _AssertWarnsContext
 import logging as _logging
 from utest.core.case import TestCase as _TestCase
@@ -83,8 +84,16 @@ class Action(object):
     """在日志中输出一般信息"""
     self._get_case_instance().info(msg = msg)
 
+  def warn(self, msg: str) -> None:
+    """在日志中输出警告信息"""
+    self._get_case_instance().warn(msg=msg)
+
   def warning(self, msg: str) -> None:
     """在日志中输出警告信息"""
+    _warnings.warn(
+      'warning()方法已弃用，请使用warn()方法',
+      DeprecationWarning
+    )
     self._get_case_instance().warning(msg = msg)
 
   def error(self, msg: str) -> None:
