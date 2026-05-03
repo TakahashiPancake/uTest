@@ -1,3 +1,4 @@
+import warnings as _warnings
 import unittest as _unittest
 from logging import Logger as _Logger
 import utest.util as _util
@@ -55,7 +56,8 @@ class Base(_unittest.TestCase):
     def add_func_2_obj(
       obj: object,
       instance: object,
-      func_name: str
+      func_name: str,
+      is_inner = False
     ) -> None:
       """
       将（日志）方法绑定到类
@@ -64,14 +66,18 @@ class Base(_unittest.TestCase):
         obj:           对象
         instance:      实例名称
         func_name:     方法名称
+        is_inner:      是否是内部方法，是的话方法名前 + '_' (bool)
 
       Returns:
         return:        无
 
       """
+      func_name_obj = func_name
+      if is_inner:
+        func_name_obj = '_' + func_name_obj
       setattr(
         obj,
-        func_name,
+        func_name_obj,
         getattr(instance, func_name)
       )
 
@@ -92,7 +98,7 @@ class Base(_unittest.TestCase):
       'warning',
       'error'
     ]:
-      add_func_2_obj(self, logger, fn)
+      add_func_2_obj(self, logger, fn, is_inner=True)
 
   def step(self, step: int, msg: str) -> None:
     """在日志中输出测试步骤"""
@@ -103,11 +109,19 @@ class Base(_unittest.TestCase):
     self._trace(msg)
 
   def info(self, msg: str) -> None:
-    """在日志中输出一般信息"""
+    """在日志中输出提示信息"""
     self._info(msg)
+
+  def warn(self, msg: str) -> None:
+    """在日志中输出警告信息"""
+    self._warning(msg)
 
   def warning(self, msg: str) -> None:
     """在日志中输出警告信息"""
+    _warnings.warn(
+      'warning()方法已弃用，请使用warn()方法',
+      DeprecationWarning
+    )
     self._warning(msg)
 
   def error(self, msg: str) -> None:
@@ -117,7 +131,7 @@ class Base(_unittest.TestCase):
   def fatal(self, msg: str) -> None:
     """在日志中输出致命错误信息"""
     self._fatal(msg)
-    # 致命错误时，直接停止执行用例
+    # 发生致命错误时，直接停止用例，并将用例置为失败
     self.fail(msg)
 
   def _trace(self, msg, *args, **kwargs) -> None: ...
