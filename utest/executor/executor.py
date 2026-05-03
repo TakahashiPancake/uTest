@@ -1,8 +1,10 @@
 import copy as _copy
 from abc import ABC as _ABC, abstractmethod as _abstractmethod
+from types import ModuleType as _ModuleType
 from typing import Any as _Any
 import xml.etree.ElementTree as _ElementTree
 import unittest as _unittest
+from unittest import TestCase as _TestCase
 from unittest import TestSuite as _TestSuite
 from unittest.runner import TextTestResult as _TextTestResult
 import HtmlTestRunner as _HtmlTestRunner
@@ -11,7 +13,6 @@ import utest.util.path as _path
 from utest.util.stream import StringIO as _StringIO
 from utest.util.date import DateTime as _DateTime
 from utest.public.stream import sync_output_stream as _sync_stream
-from utest.core.case import TestCase as _TestCase
 
 
 
@@ -43,28 +44,27 @@ class _TestExecutorBase(_ABC):
   def __del__(self):
     self._sync_buffer.clear_buffer()
 
-  def load(self, case: type[_TestCase], /, *cases: type[_TestCase]) -> _TestSuite:
+  def load(self, *tests: type[_TestCase] | _ModuleType, pattern: str | None = None) -> _TestSuite:
     """
     读取测试用例
 
     Args:
-      case:   测试用例
-      cases:  测试用例（复数）
+      tests: 测试（模块或类）（复数）
 
     Returns:
       return: 全部测试套件
 
     """
-    # 添加到套件
-    self._suite.addTest(self._load_case(case))
-
-    # 逐个添加剩余的
-    for case_ in cases:
-      self._suite.addTest(self._load_case(case_))
+    # 加载测试
+    for test in tests:
+      if isinstance(test, _ModuleType):
+        self._suite.addTest(self._load_module(test, pattern = pattern))
+      elif issubclass(test, _TestCase):
+        self._suite.addTest(self._load_case(test))
 
     return self._suite
 
-  def _load_case(self, case) -> _TestSuite:
+  def _load_case(self, case: type[_TestCase]) -> _TestSuite:
     """
     加载测试用例
 
@@ -76,6 +76,24 @@ class _TestExecutorBase(_ABC):
 
     """
     return self._loader.loadTestsFromTestCase(case)
+
+  def _load_module(self,
+    module: _ModuleType,
+    *args,
+    pattern: str | None = None
+  ) -> _TestSuite:
+    """
+    加载测试用例
+
+    Args:
+      module:  包含测试用例的模块
+      pattern: 片段，用于load_tests协议
+
+    Returns:
+      return: 无
+
+    """
+    return self._loader.loadTestsFromModule(module, *args, pattern = pattern)
 
   @_abstractmethod
   def _run_suite(self, suite, dir_name) -> _TextTestResult:
