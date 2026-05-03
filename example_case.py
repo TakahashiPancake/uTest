@@ -136,6 +136,7 @@ from utest import Action
 
 # 5.2. 编写一个动作类
 class Test_Action(Action):
+
   def action_001(self):
     # 5.2.1. 编写一些日志
     self.info('这是一个Action类内日志')
