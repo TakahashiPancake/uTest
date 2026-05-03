@@ -143,6 +143,8 @@ class Test_Action(Action):
     # 5.2.2. 编写一些断言
     self.fail('这是一个Action类内的断言')
 
+    ...
+
   ...
 
 # 5.3. 实例化 Action类
