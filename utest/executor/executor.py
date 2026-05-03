@@ -3,6 +3,7 @@ from abc import ABC as _ABC, abstractmethod as _abstractmethod
 from types import ModuleType as _ModuleType
 from typing import Any as _Any
 import xml.etree.ElementTree as _ElementTree
+from xml.etree.ElementTree import Element as _Element
 import unittest as _unittest
 from unittest import TestCase as _TestCase
 from unittest import TestSuite as _TestSuite
@@ -49,7 +50,8 @@ class _TestExecutorBase(_ABC):
     读取测试用例
 
     Args:
-      tests: 测试（模块或类）（复数）
+      tests:   测试（模块或类）（复数）
+      pattern: load_tests协议片段
 
     Returns:
       return: 全部测试套件
@@ -149,26 +151,43 @@ class _TestExecutorBase(_ABC):
 
     # 读取XML测试结果
     xml_log_str: str = self._sync_buffer_saved.getvalue()
-    xml_log_root = _ElementTree.fromstring(xml_log_str)
-    xml_log_root_main = xml_log_root.find('MAIN')
-    test_logs: list = xml_log_root_main.findall('TEST_LOG')
+    xml_log_root: _Element[str] = _ElementTree.fromstring(xml_log_str)
+    xml_log_root_main: _Element[str] = xml_log_root.find('MAIN')
 
-    for element in test_logs:
-      # 定义日志名称
-      log_name = (element.attrib['TEST_CASE'] + '_' + element.attrib['DATETIME']) \
-        .replace(':', '_').replace('.', '_')
+    def save_logs(xml_element: _Element, path: str):
 
-      # 定义日志保存路径
-      logs_saving_dir: str = _path.join(reports_saving_dir, log_name)
+      test_logs: list = xml_element.findall(path)
 
-      # 创建日志保存路径
-      _path.create_dirs(logs_saving_dir)
+      for element in test_logs:
 
-      with open(_path.join(
-        logs_saving_dir,
-        log_name + '.log'
-      ), 'w') as f:
-        print(element.text, file=f)
+        if 'unittest.suite.TestSuite' not in element.attrib['TEST_CASE']:
+
+          # 定义日志名称
+          #log_name = (element.attrib['TEST_CASE'] + '_' + element.attrib['DATETIME']) \
+          #  .replace(':', '_').replace('.', '_')
+          log_name = element.attrib['TEST_CASE'] \
+            .replace(':', '_').replace('.', '_')
+
+          # 定义日志保存路径
+          logs_saving_dir: str = _path.join(reports_saving_dir, log_name)
+
+          # 创建日志保存路径
+          _path.create_dirs(logs_saving_dir)
+
+          with open(_path.join(
+            logs_saving_dir,
+            log_name + '.log'
+          ), 'w') as file:
+            print(element.text, file=file)
+
+        elif element.find(path) is not None:
+          save_logs(element, path)
+
+        else:
+          pass
+
+    # 保存日志
+    save_logs(xml_log_root_main, 'TEST_LOG')
 
     # 保存XML格式的测试结果
     with open(_path.join(
