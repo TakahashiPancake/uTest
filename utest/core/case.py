@@ -8,7 +8,7 @@ class TestCase(_Base):
   """测试用例类"""
 
   @classmethod
-  def class_precondition(cls) -> None:
+  def precondition_class(cls) -> None:
     """每个测试用例之前执行的方法"""
     ...
 
@@ -21,7 +21,7 @@ class TestCase(_Base):
     ...
 
   @classmethod
-  def class_postcondition(cls) -> None:
+  def postcondition_class(cls) -> None:
     """每个测试用例之后执行的方法"""
     ...
 
@@ -37,7 +37,7 @@ class TestCase(_Base):
     # 日志输出测试用例标题
     _proto.case_(cls.__name__)
     # 执行测试用例前置步骤
-    cls.class_precondition()
+    cls.precondition_class()
 
 
   @classmethod
@@ -50,7 +50,7 @@ class TestCase(_Base):
 
     """
     # 执行测试用例后置步骤
-    cls.class_postcondition()
+    cls.postcondition_class()
 
 
   def setUp(self) -> None:
@@ -81,7 +81,6 @@ class TestCase(_Base):
     # 执行测试单元后置步骤
     print(_TextTestResult.separator2, file=_sync_output_stream)
     self._postcondition('后置条件:')
-    print(_TextTestResult.separator2, file=_sync_output_stream)
     self.postcondition()
-
+    print(_TextTestResult.separator2, file=_sync_output_stream)
 
