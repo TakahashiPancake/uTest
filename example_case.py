@@ -76,6 +76,7 @@ class TEST_CASE_EXAMPLE_002(TestCase):
 
     ...
 
+
 # 3. 一个测试用例含有多个测试单元的编写方式
 
 class TEST_CASE_EXAMPLE_003(TestCase):
@@ -105,6 +106,7 @@ class TEST_CASE_EXAMPLE_003(TestCase):
   #   若需要在所有测试单元执行之前执行一次前置条件，并在所有测试单元执行之后执行一次后置条件，
   #   则需要编写 precondition_class()方法 和 postcondition_class()方法
 
+
 # 4. 断言
 # utest.TestCase继承自 unittest.TestCase，
 # 所以 utest.TestCase内 可使用所有的 unittest的断言方法
@@ -124,6 +126,7 @@ class TEST_CASE_EXAMPLE_004(TestCase):
     self.info('第 2 个断言')
     self.assertTrue(False, '断言 2')
     ...
+
 
 # 5. 编写动作 (Action)
 # - Action类内，可使用 utest.TestCase 的日志方法、断言方法
@@ -153,4 +156,23 @@ class TEST_CASE_EXAMPLE_005(TestCase):
     test_action.action_001()
 
     ...
+
+
+# 6. 执行测试
+
+if __name__ == '__main__':
+
+  # 6.1. 导入HTMLTestExecutor
+  from utest import HTMLTestExecutor
+
+  # 6.2. 实例化HTMLTestExecutor
+  executor = HTMLTestExecutor()
+
+  # 6.3. 从模块加载用例
+  import sys
+  test_module = sys.modules[__name__] # 导入自身模块
+  executor.load(test_module) # 从模块加载用例
+
+  # 6.4. 执行测试用例
+  executor.run()
 
