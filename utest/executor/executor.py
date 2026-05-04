@@ -13,7 +13,7 @@ from HtmlTestRunner import HTMLTestRunner as _HTMLTestRunner
 import utest.util.path as _path
 from utest.util.stream import StringIO as _StringIO
 from utest.util.date import DateTime as _DateTime
-from utest.public.stream import sync_output_stream as _sync_stream
+from utest.public.stream import sync_output_stream as _sync_output_stream
 
 
 
@@ -27,7 +27,7 @@ class _TestExecutorBase(_ABC):
   _loader = _unittest.TestLoader()
 
   # 引用文本流缓存区
-  _sync_buffer = _sync_stream
+  _sync_buffer = _sync_output_stream
 
   # 保存的文本流缓存区
   _sync_buffer_saved: _StringIO | None = None
