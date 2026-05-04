@@ -47,5 +47,4 @@ from utest.core.case import TestCase
 from utest.core.action import Action
 from utest.executor.executor import TextTestExecutor, HTMLTestExecutor
 import utest.public.variable.path as active_path
-from utest.public.variable.path import saving_path
 
