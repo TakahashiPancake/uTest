@@ -8,7 +8,9 @@ from unittest import TestResult as _TestResult
 from unittest import TestCase as _TestCase
 from unittest import TextTestResult as _TextTestResult
 import unittest as _unittest
-import utest.util.framework as framework_util
+import utest.util.path as _path
+import utest.util.framework as _framework_util
+import utest.meta as _meta
 from utest.patch.base import PatcherBase as _PatcherBase
 from utest.public.stream import sync_output_stream as _sync_output_stream
 
@@ -21,9 +23,18 @@ class LoaderPatch(_PatcherBase):
   def getTestCaseNames(self, testCaseClass):
     """ Return a sorted sequence of method names found within testCaseClass """
 
+    # 读取config
+    config = _framework_util.read_yaml_config(_path.framework.abs_path(_path.join(
+      _meta.CONFIG_DIR, _meta.CONFIGs.UNITTEST
+    )))
+
+    # config下 test_loader字段
+    config_loader = config.get('test_loader')
+
     def should_include_method(attr_name):
       # 添加测试方法名称
-      if not (attr_name.startswith(self.testMethodPrefix) or attr_name == 'testcase'):
+
+      if not (attr_name.startswith(self.testMethodPrefix) or attr_name == config_loader.get('test_method_extra')):
         return False
       test_func = getattr(testCaseClass, attr_name)
       if not callable(test_func):
@@ -203,7 +214,7 @@ def patch_unittest_by_config_file(
   if not hasattr(_unittest, '_patched'):
 
     # 读取配置文件
-    config = framework_util.read_yaml_config(
+    config = _framework_util.read_yaml_config(
       config_path=config_path,
       encoding=encoding
     )
