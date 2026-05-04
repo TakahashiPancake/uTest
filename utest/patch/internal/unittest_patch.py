@@ -13,6 +13,7 @@ import utest.util.framework as _framework_util
 import utest.meta as _meta
 from utest.patch.base import PatcherBase as _PatcherBase
 from utest.public.stream import sync_output_stream as _sync_output_stream
+import utest.public.variable.path as _public_variable_path
 
 
 class LoaderPatch(_PatcherBase):
@@ -96,13 +97,21 @@ class SuitePatch(_PatcherBase):
           # 使用XML标签将测试用例结果封装
           # 测试套件不为空
           if test._tests:
+            # 测试用例ID
+            test_case_id: str = _inspect.getmodule(test._tests[0]).__name__ + '.' + type(test._tests[0]).__name__
+
+            if 'unittest.suite.TestSuite' not in test_case_id:
+              # 设置保存路径
+              _public_variable_path.saving_path = _path.join(_public_variable_path.report_path, test_case_id)
+
+              # 创建日志保存路径
+              _path.create_dirs(_public_variable_path.saving_path)
+
+            # 测试日期&测试时间
+            test_datetime: str = _DateTime.get_formatted_datetime('%Y-%m-%d_%H:%M:%S.%f')
+
             print(
-              r'<TEST_LOG TEST_CASE="{}" DATETIME="{}">'.format(
-                # 测试用例标题
-                _inspect.getmodule(test._tests[0]).__name__ + '.' + type(test._tests[0]).__name__,
-                # 测试日期&测试时间
-                _DateTime.get_formatted_datetime('%Y-%m-%d_%H:%M:%S.%f')
-              ),
+              r'<TEST_LOG TEST_CASE="{}" DATETIME="{}">'.format(test_case_id, test_datetime),
               sep='', file=_sync_output_stream
             )
             # 执行测试套件

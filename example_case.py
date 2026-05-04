@@ -160,22 +160,30 @@ class TEST_CASE_EXAMPLE_005(TestCase):
 
     ...
 
+# 6. 保存路径
 
-# 6. 执行测试
+# 6.1. 导入路径模块
+from utest import saving_path
+
+class TEST_CASE_EXAMPLE_006(TestCase):
+  def testcase(self):
+    self.info(f'内容保存路径: {saving_path()}')
+
+# 7. 执行测试
 
 if __name__ == '__main__':
 
-  # 6.1. 导入HTMLTestExecutor
+  # 7.1. 导入HTMLTestExecutor
   from utest import HTMLTestExecutor
 
-  # 6.2. 实例化HTMLTestExecutor
+  # 7.2. 实例化HTMLTestExecutor
   executor = HTMLTestExecutor()
 
-  # 6.3. 从模块加载用例
+  # 7.3. 从模块加载用例
   import sys
   test_module = sys.modules[__name__] # 导入自身模块
   executor.load(test_module) # 从模块加载用例
 
-  # 6.4. 执行测试用例
+  # 7.4. 执行测试用例
   executor.run()
 

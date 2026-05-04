@@ -21,10 +21,8 @@ from utest.core.case import TestCase as _TestCase
 from utest.public.proto import proto as _proto
 
 
-_T = _TypeVar('_T')
 _E = _TypeVar('_E', bound=BaseException)
 _P = _ParamSpec('_P')
-_S = _TypeVar('_S')
 
 
 class Action(object):
@@ -118,54 +116,71 @@ class Action(object):
   ####################
 
   def fail(self, msg: _Any = None) -> _NoReturn:
+    """将测试用例置为失败，并输出信息"""
     self._get_case_instance().fail(msg=msg)
 
   def assertEqual(self, first: _Any, second: _Any, msg: _Any = None) -> None:
+    """若两个对象不相等，则测试用例失败"""
     self._get_case_instance().assertEqual(first, second, msg = msg)
 
   def assertNotEqual(self, first: _Any, second: _Any, msg: _Any = None) -> None:
+    """若两个对象相等，则测试用例失败"""
     self._get_case_instance().assertNotEqual(first, second, msg = msg)
 
   def assertTrue(self, expr: _Any, msg: _Any = None) -> None:
+    """若表达式为假，则测试用例失败"""
     self._get_case_instance().assertTrue(expr, msg = msg)
 
   def assertFalse(self, expr: _Any, msg: _Any = None) -> None:
+    """若表达式为真，则测试用例失败"""
     self._get_case_instance().assertFalse(expr, msg = msg)
 
   def assertIs(self, expr1: object, expr2: object, msg: _Any = None) -> None:
+    """若表达式1不是表达式2，则测试用例失败"""
     self._get_case_instance().assertIs(expr1, expr2, msg = msg)
 
   def assertIsNot(self, expr1: object, expr2: object, msg: _Any = None) -> None:
+    """若表达式1是表达式2，则测试用例失败"""
     self._get_case_instance().assertIsNot(expr1, expr2, msg = msg)
 
   def assertIsNone(self, obj: object, msg: _Any = None) -> None:
+    """若传入对象不是None，则测试用例失败"""
     self._get_case_instance().assertIsNone(obj, msg = msg)
 
   def assertIsNotNone(self, obj: object, msg: _Any = None) -> None:
+    """若传入对象是None，则测试用例失败"""
     self._get_case_instance().assertIsNotNone(obj, msg = msg)
 
   def assertIn(self, member: _Any, container: _Iterable[_Any] | _Container[_Any], msg: _Any = None) -> None:
+    """若元素不在容器内，则测试用例失败"""
     self._get_case_instance().assertIn(member, container, msg = msg)
 
   def assertNotIn(self, member: _Any, container: _Iterable[_Any] | _Container[_Any], msg: _Any = None) -> None:
+    """若元素在容器内，则测试用例失败"""
     self._get_case_instance().assertNotIn(member, container, msg = msg)
 
   def assertIsInstance(self, obj: object, cls: type[object], msg: _Any = None) -> None:
+    """若传入对象不是传入类的实例，则测试用例失败"""
     self._get_case_instance().assertIsInstance(obj, cls, msg = msg)
 
   def assertNotIsInstance(self, obj: object, cls: type[object], msg: _Any = None) -> None:
+    """若传入对象是传入类的实例，则测试用例失败"""
     self._get_case_instance().assertNotIsInstance(obj, cls, msg = msg)
 
-  def assertGreater(self, a: type[_T], b: type[_T], msg: _Any = None) -> None:
+  def assertGreater(self, a, b, msg: _Any = None) -> None:
+    """若a不大于b，则测试用例失败"""
     self._get_case_instance().assertGreater(a, b, msg = msg)
 
-  def assertGreaterEqual(self, a: type[_T], b: type[_T], msg: _Any = None) -> None:
+  def assertGreaterEqual(self, a, b, msg: _Any = None) -> None:
+    """若a小于b，则测试用例失败"""
     self._get_case_instance().assertGreaterEqual(a, b, msg = msg)
 
-  def assertLess(self, a: type[_T], b: type[_T], msg: _Any = None) -> None:
+  def assertLess(self, a, b, msg: _Any = None) -> None:
+    """若a不小于b，则测试用例失败"""
     self._get_case_instance().assertLess(a, b, msg = msg)
 
-  def assertLessEqual(self, a: type[_T], b: type[_T], msg: _Any = None) -> None:
+  def assertLessEqual(self, a, b, msg: _Any = None) -> None:
+    """若a大于b，则测试用例失败"""
     self._get_case_instance().assertLessEqual(a, b, msg = msg)
 
   @_overload
@@ -282,21 +297,21 @@ class Action(object):
 
   @_overload
   def assertAlmostEqual(
-    self, first: type[_S], second: type[_S], places: None, msg: _Any, delta
+    self, first, second, places: None, msg: _Any, delta
   ) -> None:
     ...
 
   @_overload
   def assertAlmostEqual(
-    self, first: type[_S], second: type[_S], places: None = None, msg: _Any = None, *, delta
+    self, first, second, places: None = None, msg: _Any = None, *, delta
   ) -> None:
     ...
 
   @_overload
   def assertAlmostEqual(
     self,
-    first: type[_T],
-    second: type[_T],
+    first,
+    second,
     places: int | None = None,
     msg: _Any = None,
     delta: None = None,
@@ -304,22 +319,23 @@ class Action(object):
     ...
 
   def assertAlmostEqual(self, first, second, places=None, msg=None, delta=None) -> None:
+    """若对象1约等于对象2，则通过"""
     self._get_case_instance().assertAlmostEqual(first, second, places=places, msg=msg, delta=delta)
 
   @_overload
-  def assertNotAlmostEqual(self, first: type[_S], second: type[_S], places: None, msg: _Any, delta) -> None:
+  def assertNotAlmostEqual(self, first, second, places: None, msg: _Any, delta) -> None:
     ...
 
   @_overload
   def assertNotAlmostEqual(
-    self, first: type[_S], second: type[_S], places: None = None, msg: _Any = None, *, delta
+    self, first, second, places: None = None, msg: _Any = None, *, delta
   ) -> None:
     ...
 
   @_overload
   def assertNotAlmostEqual(
-    self, first: type[_T],
-    second: type[_T],
+    self, first,
+    second,
     places: int | None = None,
     msg: _Any = None,
     delta: None = None,
@@ -327,6 +343,7 @@ class Action(object):
     ...
 
   def assertNotAlmostEqual(self, first, second, places=None, msg=None, delta=None) -> None:
+    """若对象1约等于对象2，则失败"""
     self._get_case_instance().assertNotAlmostEqual(first, second, places=places, msg=msg, delta=delta)
 
   def assertRegex(self, text: _AnyStr, expected_regex: _AnyStr | _Pattern[_AnyStr], msg: _Any = None) -> None:
