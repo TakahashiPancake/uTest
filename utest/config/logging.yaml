@@ -25,19 +25,19 @@ more_levels:
     level: 91
 
 # 1.3.2 UNIT级别
-# -  输出测试单元
+# - 输出测试单元
   _unit:
     name:  TEST_UNIT
     level: 92
 
 # 1.3.3 PRECONDITION级别
-# -  输出前置条件
+# - 输出前置条件
   _precondition:
     name:  PRECOND
     level: 93
 
 # 1.3.4 POSTCONDITION级别
-# -  输出后置条件
+# - 输出后置条件
   _postcondition:
     name:  POSTCOND
     level: 94
