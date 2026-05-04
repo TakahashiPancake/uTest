@@ -5,13 +5,13 @@ more_levels:
 
 # 1.1 TRACE级别
 # - 代替DEBUG级别
-  trace:
-    name:  TRACE
+  _trace:
+    name:  DEBUG
     level: 15
 
 # 1.2. FATAL级别
 # - 代替CRITICAL级别
-  fatal:
+  _fatal:
     name:  FATAL
     level: 55
 
@@ -30,19 +30,31 @@ more_levels:
     name:  TEST_UNIT
     level: 92
 
-# 1.3.3 STEP级别
-# - 输出测试步骤
-  step:
-    name:  STEP
+# 1.3.3 PRECONDITION级别
+# -  输出前置条件
+  _precondition:
+    name:  PRECOND
+    level: 93
+
+# 1.3.4 POSTCONDITION级别
+# -  输出后置条件
+  _postcondition:
+    name:  POSTCOND
     level: 94
 
-# 1.3.4 SUCCESS级别
+# 1.3.5 STEP级别
+# - 输出测试步骤
+  _step:
+    name:  STEP
+    level: 95
+
+# 1.3.6 SUCCESS级别
 # - 输出测试成功
   _pass:
     name:  PASS
     level: 96
 
-# 1.3.5 FAIL级别
+# 1.3.7 FAIL级别
 # - 输出测试失败
   _fail:
     name: FAIL

@@ -3,3 +3,6 @@ test_loader:
   # 以"unit_"打头的方法被认为是测试方法
   test_method_prefix: unit_
 
+  # 额外的测试方法
+  test_method_extra: testcase
+
