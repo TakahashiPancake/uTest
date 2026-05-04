@@ -1,4 +1,4 @@
-__all__ = ['TestCase', 'Action', 'TextTestExecutor', 'HTMLTestExecutor']
+__all__ = ['TestCase', 'Action', 'active_path', 'TextTestExecutor', 'HTMLTestExecutor']
 
 
 import utest.meta as _meta
@@ -46,4 +46,6 @@ _system.set_cmd_encoding('utf-8')
 from utest.core.case import TestCase
 from utest.core.action import Action
 from utest.executor.executor import TextTestExecutor, HTMLTestExecutor
+import utest.public.variable.path as active_path
+from utest.public.variable.path import saving_path
 

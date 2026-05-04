@@ -102,10 +102,10 @@ class SuitePatch(_PatcherBase):
 
             if 'unittest.suite.TestSuite' not in test_case_id:
               # 设置保存路径
-              _public_variable_path.save_path = _path.join(_public_variable_path.report_path, test_case_id)
+              _public_variable_path.saving_path = _path.join(_public_variable_path.report_path, test_case_id)
 
               # 创建日志保存路径
-              _path.create_dirs(_public_variable_path.save_path)
+              _path.create_dirs(_public_variable_path.saving_path)
 
             # 测试日期&测试时间
             test_datetime: str = _DateTime.get_formatted_datetime('%Y-%m-%d_%H:%M:%S.%f')

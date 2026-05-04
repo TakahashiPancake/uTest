@@ -2,5 +2,5 @@
 report_path: str | None = None
 
 # 定义保存路径
-save_path: str | None = None
+saving_path: str | None = None
 
