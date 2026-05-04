@@ -147,14 +147,9 @@ class _TestExecutorBase(_ABC):
     # 保存缓存区
     self._sync_buffer_saved = _copy.copy(self._sync_buffer)
 
-    # 保存文本格式日志
-
-    # 读取XML测试结果
-    xml_log_str: str = self._sync_buffer_saved.getvalue()
-    xml_log_root: _Element[str] = _ElementTree.fromstring(xml_log_str)
-    xml_log_root_main: _Element[str] = xml_log_root.find('MAIN')
-
+    # 定义保存日志方法
     def save_logs(xml_element: _Element, path: str):
+      """递归保存日志"""
 
       test_logs: list = xml_element.findall(path)
 
@@ -186,6 +181,13 @@ class _TestExecutorBase(_ABC):
         else:
           pass
 
+    # 保存文本格式日志
+
+    # 读取XML测试结果
+    xml_log_str: str = self._sync_buffer_saved.getvalue()
+    xml_log_root: _Element[str] = _ElementTree.fromstring(xml_log_str)
+    xml_log_root_main: _Element[str] = xml_log_root.find('MAIN')
+
     # 保存日志
     save_logs(xml_log_root_main, 'TEST_LOG')
 
@@ -200,13 +202,15 @@ class _TestExecutorBase(_ABC):
     return result
 
 
-class TextTestExecutor(_TestExecutorBase, _ABC):
+class TextTestExecutor(_TestExecutorBase):
   """文本测试执行器"""
 
   def __init__(self) -> None:
     super().__init__()
     self._runner = _unittest.TextTestRunner()
 
+  def _run_suite(self, suite, dir_name) -> _TextTestResult:
+    ...
 
 class HTMLTestExecutor(_TestExecutorBase):
   """HTML测试执行器"""
