@@ -5,9 +5,11 @@ from utest.patch.internal.logging_patch import patch_logging_by_config_file
 from utest.patch.internal.unittest_patch import patch_unittest_by_config_file
 
 from utest.patch.internal.unittest_patch import \
-  SuitePatch as UnitTestSuitePatch, \
+  LoaderPatch as UnitTestLoaderPatch,           \
+  SuitePatch as UnitTestSuitePatch,             \
   ResultPatch as UnitTestResultPatch
 
 def patch():
+  UnitTestLoaderPatch()()
   UnitTestSuitePatch()()
   UnitTestResultPatch()()

@@ -1,8 +1,11 @@
 import copy as _copy
 from abc import ABC as _ABC, abstractmethod as _abstractmethod
+from types import ModuleType as _ModuleType
 from typing import Any as _Any
 import xml.etree.ElementTree as _ElementTree
+from xml.etree.ElementTree import Element as _Element
 import unittest as _unittest
+from unittest import TestCase as _TestCase
 from unittest import TestSuite as _TestSuite
 from unittest.runner import TextTestResult as _TextTestResult
 import HtmlTestRunner as _HtmlTestRunner
@@ -10,8 +13,7 @@ from HtmlTestRunner import HTMLTestRunner as _HTMLTestRunner
 import utest.util.path as _path
 from utest.util.stream import StringIO as _StringIO
 from utest.util.date import DateTime as _DateTime
-from utest.common.stream import sync_output_stream as _sync_stream
-from utest.core.case import TestCase as _TestCase
+from utest.public.stream import sync_output_stream as _sync_stream
 
 
 
@@ -43,28 +45,28 @@ class _TestExecutorBase(_ABC):
   def __del__(self):
     self._sync_buffer.clear_buffer()
 
-  def load(self, case: type[_TestCase], /, *cases: type[_TestCase]) -> _TestSuite:
+  def load(self, *tests: type[_TestCase] | _ModuleType, pattern: str | None = None) -> _TestSuite:
     """
     读取测试用例
 
     Args:
-      case:   测试用例
-      cases:  测试用例（复数）
+      tests:   测试（模块或类）（复数）
+      pattern: load_tests协议片段
 
     Returns:
       return: 全部测试套件
 
     """
-    # 添加到套件
-    self._suite.addTest(self._load_case(case))
-
-    # 逐个添加剩余的
-    for case_ in cases:
-      self._suite.addTest(self._load_case(case_))
+    # 加载测试
+    for test in tests:
+      if isinstance(test, _ModuleType):
+        self._suite.addTest(self._load_module(test, pattern = pattern))
+      elif issubclass(test, _TestCase):
+        self._suite.addTest(self._load_case(test))
 
     return self._suite
 
-  def _load_case(self, case) -> _TestSuite:
+  def _load_case(self, case: type[_TestCase]) -> _TestSuite:
     """
     加载测试用例
 
@@ -76,6 +78,24 @@ class _TestExecutorBase(_ABC):
 
     """
     return self._loader.loadTestsFromTestCase(case)
+
+  def _load_module(self,
+    module: _ModuleType,
+    *args,
+    pattern: str | None = None
+  ) -> _TestSuite:
+    """
+    加载测试用例
+
+    Args:
+      module:  包含测试用例的模块
+      pattern: 片段，用于load_tests协议
+
+    Returns:
+      return: 无
+
+    """
+    return self._loader.loadTestsFromModule(module, *args, pattern = pattern)
 
   @_abstractmethod
   def _run_suite(self, suite, dir_name) -> _TextTestResult:
@@ -127,30 +147,49 @@ class _TestExecutorBase(_ABC):
     # 保存缓存区
     self._sync_buffer_saved = _copy.copy(self._sync_buffer)
 
+    # 定义保存日志方法
+    def save_logs(xml_element: _Element, path: str):
+      """递归保存日志"""
+
+      test_logs: list = xml_element.findall(path)
+
+      for element in test_logs:
+
+        if 'unittest.suite.TestSuite' not in element.attrib['TEST_CASE']:
+
+          # 定义日志名称
+          #log_name = (element.attrib['TEST_CASE'] + '_' + element.attrib['DATETIME']) \
+          #  .replace(':', '_').replace('.', '_')
+          log_name = element.attrib['TEST_CASE'] \
+            .replace(':', '_').replace('.', '_')
+
+          # 定义日志保存路径
+          logs_saving_dir: str = _path.join(reports_saving_dir, log_name)
+
+          # 创建日志保存路径
+          _path.create_dirs(logs_saving_dir)
+
+          with open(_path.join(
+            logs_saving_dir,
+            log_name + '.log'
+          ), 'w') as file:
+            print(element.text, file=file)
+
+        elif element.find(path) is not None:
+          save_logs(element, path)
+
+        else:
+          pass
+
     # 保存文本格式日志
 
     # 读取XML测试结果
     xml_log_str: str = self._sync_buffer_saved.getvalue()
-    xml_log_root = _ElementTree.fromstring(xml_log_str)
-    xml_log_root_main = xml_log_root.find('MAIN')
-    test_logs: list = xml_log_root_main.findall('TEST_LOG')
+    xml_log_root: _Element[str] = _ElementTree.fromstring(xml_log_str)
+    xml_log_root_main: _Element[str] = xml_log_root.find('MAIN')
 
-    for element in test_logs:
-      # 定义日志名称
-      log_name = (element.attrib['TEST_CASE'] + '_' + element.attrib['DATETIME']) \
-        .replace(':', '_').replace('.', '_')
-
-      # 定义日志保存路径
-      logs_saving_dir: str = _path.join(reports_saving_dir, log_name)
-
-      # 创建日志保存路径
-      _path.create_dirs(logs_saving_dir)
-
-      with open(_path.join(
-        logs_saving_dir,
-        log_name + '.log'
-      ), 'w') as f:
-        print(element.text, file=f)
+    # 保存日志
+    save_logs(xml_log_root_main, 'TEST_LOG')
 
     # 保存XML格式的测试结果
     with open(_path.join(
@@ -163,13 +202,15 @@ class _TestExecutorBase(_ABC):
     return result
 
 
-class TextTestExecutor(_TestExecutorBase, _ABC):
+class TextTestExecutor(_TestExecutorBase):
   """文本测试执行器"""
 
   def __init__(self) -> None:
     super().__init__()
     self._runner = _unittest.TextTestRunner()
 
+  def _run_suite(self, suite, dir_name) -> _TextTestResult:
+    ...
 
 class HTMLTestExecutor(_TestExecutorBase):
   """HTML测试执行器"""

@@ -1,12 +1,54 @@
 import inspect as _inspect
 from utest.util.date import DateTime as _DateTime
+import functools as _func_tools
+from fnmatch import fnmatchcase as _fnmatchcase
+from unittest import TestLoader as _TestLoader
 from unittest import TestSuite as _TestSuite
 from unittest import TestResult as _TestResult
 from unittest import TestCase as _TestCase
+from unittest import TextTestResult as _TextTestResult
 import unittest as _unittest
-import utest.util.framework as framework_util
+import utest.util.path as _path
+import utest.util.framework as _framework_util
+import utest.meta as _meta
 from utest.patch.base import PatcherBase as _PatcherBase
-from utest.common.stream import sync_output_stream as _sync_buffer
+from utest.public.stream import sync_output_stream as _sync_output_stream
+
+
+class LoaderPatch(_PatcherBase):
+
+  _class_to_patch = _TestLoader
+
+  @staticmethod
+  def getTestCaseNames(self, testCaseClass):
+    """ Return a sorted sequence of method names found within testCaseClass """
+
+    # 读取config
+    config = _framework_util.read_yaml_config(_path.framework.abs_path(_path.join(
+      _meta.CONFIG_DIR, _meta.CONFIGs.UNITTEST
+    )))
+
+    # config下 test_loader字段
+    config_loader = config.get('test_loader')
+
+    def should_include_method(attr_name):
+      # 添加测试方法名称
+
+      if not (attr_name.startswith(self.testMethodPrefix) or attr_name == config_loader.get('test_method_extra')):
+        return False
+      test_func = getattr(testCaseClass, attr_name)
+      if not callable(test_func):
+        return False
+      full_name = f'%s.%s.%s' % (
+        testCaseClass.__module__, testCaseClass.__qualname__, attr_name
+      )
+      return self.testNamePatterns is None or \
+        any(_fnmatchcase(full_name, pattern) for pattern in self.testNamePatterns)
+
+    test_fn_names = list(filter(should_include_method, dir(testCaseClass)))
+    if self.sortTestMethodsUsing:
+      test_fn_names.sort(key=_func_tools.cmp_to_key(self.sortTestMethodsUsing))
+    return test_fn_names
 
 
 class SuitePatch(_PatcherBase):
@@ -52,29 +94,41 @@ class SuitePatch(_PatcherBase):
       if not debug:
         if isinstance(test, _TestSuite):
           # 使用XML标签将测试用例结果封装
-          print(
-            r'<TEST_LOG TEST_CASE="{}" DATETIME="{}">'.format(
-              # 测试用例标题
-              _inspect.getmodule(test._tests[0]).__name__ + '.' + type(test._tests[0]).__name__,
-              # 测试日期&测试时间
-              _DateTime.get_formatted_datetime('%Y-%m-%d_%H:%M:%S.%f')
-            ),
-            sep='', file=_sync_buffer
-          )
-          # 执行测试套件
-          test(result)
-          # XML结束标签
-          print(
-            '</TEST_LOG>',
-            sep='', file=_sync_buffer
-          )
+          # 测试套件不为空
+          if test._tests:
+            print(
+              r'<TEST_LOG TEST_CASE="{}" DATETIME="{}">'.format(
+                # 测试用例标题
+                _inspect.getmodule(test._tests[0]).__name__ + '.' + type(test._tests[0]).__name__,
+                # 测试日期&测试时间
+                _DateTime.get_formatted_datetime('%Y-%m-%d_%H:%M:%S.%f')
+              ),
+              sep='', file=_sync_output_stream
+            )
+            # 执行测试套件
+            test(result)
+            # XML结束标签
+            print(
+              '</TEST_LOG>',
+              sep='', file=_sync_output_stream
+            )
+
+          # 测试套件为空
+          else:
+            # 执行测试套件
+            test(result)
         elif isinstance(test, _TestCase):
+          # 输出分隔符
+          result.stream.write(_TextTestResult.separator1)
+          result.stream.writeln()
+          result.stream.flush()
           # 执行测试用例
           test(result)
           # 输出自定义错误&自定义失败
           result.print_errors_custom()
           # 清除自定义错误&自定义失败
           result.clear_errors_custom()
+
         else:
           pass
       else:
@@ -160,7 +214,7 @@ def patch_unittest_by_config_file(
   if not hasattr(_unittest, '_patched'):
 
     # 读取配置文件
-    config = framework_util.read_yaml_config(
+    config = _framework_util.read_yaml_config(
       config_path=config_path,
       encoding=encoding
     )
