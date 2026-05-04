@@ -167,7 +167,7 @@ from utest import active_path
 
 class TEST_CASE_EXAMPLE_006(TestCase):
   def testcase(self):
-    self.info(f'{active_path.saving_path}')
+    self.info(f'内容保存路径: {active_path.saving_path}')
 
 # 7. 执行测试
 
