@@ -163,11 +163,11 @@ class TEST_CASE_EXAMPLE_005(TestCase):
 # 6. 保存路径
 
 # 6.1. 导入路径模块
-from utest import active_path
+from utest import active_paths
 
 class TEST_CASE_EXAMPLE_006(TestCase):
   def testcase(self):
-    self.info(f'内容保存路径: {active_path.saving_path}')
+    self.info(f'内容保存路径: {active_paths.saving_path}')
 
 # 7. 执行测试
 
