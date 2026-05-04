@@ -14,6 +14,7 @@ import utest.util.path as _path
 from utest.util.stream import StringIO as _StringIO
 from utest.util.date import DateTime as _DateTime
 from utest.public.stream import sync_output_stream as _sync_output_stream
+import utest.public.variable.path as _public_variable_path
 
 
 
@@ -137,6 +138,9 @@ class _TestExecutorBase(_ABC):
 
     # 定义报告保存路径
     reports_saving_dir: str = _path.join(output, report_name)
+
+    # 报告保存路径
+    _public_variable_path.report_path = reports_saving_dir
 
     # 创建报告保存路径
     _path.create_dirs(reports_saving_dir)
