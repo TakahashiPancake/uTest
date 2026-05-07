@@ -1,3 +1,11 @@
+"""
+Copyright (c) 2026 Yidong Zhu
+
+Repository: https://github.com/TakahashiPancake/uTest
+
+Licensed under MIT (https://github.com/TakahashiPancake/uTest/blob/main/LICENSE)
+
+"""
 from utest.public.stream import sync_output_stream as _sync_output_stream
 
 
