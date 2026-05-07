@@ -1,9 +1,9 @@
 """
 Copyright (c) 2026 Yidong Zhu
 
-Repository: https://github.com/TakahashiPancake/uTest
-
 Licensed under MIT (https://github.com/TakahashiPancake/uTest/blob/main/LICENSE)
+
+Repository: https://github.com/TakahashiPancake/uTest
 
 """
 import datetime as _datetime
