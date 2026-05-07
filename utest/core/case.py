@@ -1,3 +1,11 @@
+"""
+Copyright (c) 2026 Yidong Zhu
+
+Repository: https://github.com/TakahashiPancake/uTest
+
+Licensed under MIT (https://github.com/TakahashiPancake/uTest/blob/main/LICENSE)
+
+"""
 from unittest import TextTestResult as _TextTestResult
 from utest.core.base import Base as _Base
 from utest.public.proto import proto as _proto

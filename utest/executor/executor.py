@@ -1,3 +1,11 @@
+"""
+Copyright (c) 2026 Yidong Zhu
+
+Repository: https://github.com/TakahashiPancake/uTest
+
+Licensed under MIT (https://github.com/TakahashiPancake/uTest/blob/main/LICENSE)
+
+"""
 import copy as _copy
 from abc import ABC as _ABC, abstractmethod as _abstractmethod
 from types import ModuleType as _ModuleType
