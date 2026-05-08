@@ -106,11 +106,19 @@ class SuitePatch(_PatcherBase):
           # 测试套件不为空
           if test._tests:
             # 测试用例ID
-            test_case_id: str = _inspect.getmodule(test._tests[0]).__name__ + '.' + type(test._tests[0]).__name__
+            # 日志内的
+            test_case_id = _inspect.getmodule(test._tests[0]).__name__ + '.' + type(test._tests[0]).__name__
+            # 公用的
+            _public_variable_path.test_case_id = test_case_id \
+              .replace(':', '_').replace('.', '__')
 
             if 'unittest.suite.TestSuite' not in test_case_id:
+
               # 设置保存路径
-              _public_variable_path.saving_path = _path.join(_public_variable_path.report_path, test_case_id)
+              _public_variable_path.saving_path = _path.join(
+                _public_variable_path.report_path,
+                _public_variable_path.test_case_id,
+              )
 
               # 创建日志保存路径
               _path.create_dirs(_public_variable_path.saving_path)

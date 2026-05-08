@@ -173,7 +173,7 @@ class _TestExecutorBase(_ABC):
           #log_name = (element.attrib['TEST_CASE'] + '_' + element.attrib['DATETIME']) \
           #  .replace(':', '_').replace('.', '_')
           log_name = element.attrib['TEST_CASE'] \
-            .replace(':', '_').replace('.', '_')
+            .replace(':', '_').replace('.', '__')
 
           # 定义日志保存路径
           logs_saving_dir: str = _path.join(reports_saving_dir, log_name)
