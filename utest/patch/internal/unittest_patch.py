@@ -21,7 +21,7 @@ import utest.util.framework as _framework_util
 import utest.meta as _meta
 from utest.patch.base import PatcherBase as _PatcherBase
 from utest.public.stream import sync_output_stream as _sync_output_stream
-import utest.public.variable.path as _public_variable_path
+import utest.public.variable.variable as _public_variable_path
 
 
 class LoaderPatch(_PatcherBase):

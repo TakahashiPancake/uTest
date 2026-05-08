@@ -22,7 +22,7 @@ import utest.util.path as _path
 from utest.util.stream import StringIO as _StringIO
 from utest.util.date import DateTime as _DateTime
 from utest.public.stream import sync_output_stream as _sync_output_stream
-import utest.public.variable.path as _public_variable_path
+import utest.public.variable.variable as _public_variable_path
 
 
 
