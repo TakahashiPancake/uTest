@@ -6,6 +6,9 @@ Licensed under MIT (https://github.com/TakahashiPancake/uTest/blob/main/LICENSE)
 Repository: https://github.com/TakahashiPancake/uTest
 
 """
+# 定义测试用例ID
+test_case_id: str | None = None
+
 # 定义报告路径
 report_path: str | None = None
 

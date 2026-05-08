@@ -408,11 +408,11 @@ Action类内，可使用utest.TestCase的日志方法、断言方法
 
    ```python
    from utest import TestCase
-   from utest import saving_path
+   from utest import variable
    
    class TEST_CASE_EXAMPLE_006(TestCase):
      def testcase(self):
-       self.info(f'内容保存路径: {saving_path()}')
+       self.info(f'内容保存路径: {variable.saving_path}')
      ...
    ```
 

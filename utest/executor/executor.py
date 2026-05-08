@@ -22,7 +22,7 @@ import utest.util.path as _path
 from utest.util.stream import StringIO as _StringIO
 from utest.util.date import DateTime as _DateTime
 from utest.public.stream import sync_output_stream as _sync_output_stream
-import utest.public.variable.path as _public_variable_path
+import utest.public.variable.variable as _public_variable_path
 
 
 
@@ -173,7 +173,7 @@ class _TestExecutorBase(_ABC):
           #log_name = (element.attrib['TEST_CASE'] + '_' + element.attrib['DATETIME']) \
           #  .replace(':', '_').replace('.', '_')
           log_name = element.attrib['TEST_CASE'] \
-            .replace(':', '_').replace('.', '_')
+            .replace(':', '_').replace('.', '__')
 
           # 定义日志保存路径
           logs_saving_dir: str = _path.join(reports_saving_dir, log_name)
