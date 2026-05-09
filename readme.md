@@ -402,7 +402,7 @@ Action类内，可使用utest.TestCase的日志方法、断言方法
 
 ### 保存文件
 
-通过utest.saving_path()方法获取当前保存目录
+utest.variable.saving_path是当前保存路径
 
 1. 示例代码
 
